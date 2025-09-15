@@ -1,6 +1,6 @@
 <?php
 // NOTE: Define que a resposta será JSON
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 
 // NOTE: Captura erros para evitar HTML indesejado
 try {
@@ -66,5 +66,5 @@ try {
 //   $resposta["codigo"] = false;
 // }
 
-// header('Content-Type: application/json');
+// header("Content-Type: application/json");
 // echo json_encode($resposta);
