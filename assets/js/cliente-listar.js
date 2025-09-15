@@ -88,13 +88,13 @@ async function excluirCliente(id) {
         body: `id=${id}`
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (result.codigo) {
+      if (data.codigo) {
         alert("Cliente excluído com sucesso!");
         clienteListar(); // Recarrega a lista
       } else {
-        alert("Erro ao excluir cliente: " + result.msg);
+        alert("Erro ao excluir cliente: " + data.msg);
       }
     } catch (error) {
       alert("Erro de conexão: " + error.message);
