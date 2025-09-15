@@ -71,11 +71,13 @@ async function clienteListar() {
   }
 }
 
+// TODO: colocar em cliente-editar.js
 // Função para editar cliente
 function editarCliente(id) {
   window.location.href = `../client/cliente-editar.html?id=${id}`;
 }
 
+// TODO: colocar em cliente-excluir.js
 // Função para excluir cliente
 async function excluirCliente(id) {
   if (confirm("Tem certeza que deseja excluir este cliente?")) {
