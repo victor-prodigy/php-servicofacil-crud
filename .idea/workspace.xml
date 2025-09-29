@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f76a6bb9-3a3a-4741-8c1a-17208658457e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/setup-database.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/test-connection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/test-signup.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/cliente-listar.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/cliente-listar.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/js/profile-navigation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/cliente-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/cliente-dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/cliente-editar.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/cliente-editar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/cliente-listar.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/cliente-listar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/cliente-novo.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/cliente-novo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/prestador-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/prestador-dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/signin.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/signin.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/signup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diagnostic-test.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/db.sql" beforeDir="false" afterPath="$PROJECT_DIR$/lib/db.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/seed.sql" beforeDir="false" afterPath="$PROJECT_DIR$/lib/seed.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/navigation-test.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test-authentication-system.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test-login.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/unified-system-test.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-test-authentication.php" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="33LIllPWR2G93EjHCbw3Gk1rWqI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-WS-252.26199.162" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f76a6bb9-3a3a-4741-8c1a-17208658457e" name="Changes" comment="" />
+      <created>1759090080265</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1759090080265</updated>
+      <workItem from="1759090082152" duration="2357000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -46,8 +46,8 @@ async function clienteListar() {
             <td>${linha.email}</td>
             <td>${linha.data_cadastro || 'N/A'}</td>
             <td>
-              <button class="btn btn-sm btn-warning" onclick="carregarCliente(${linha.id})">Editar</button>
-              <button class="btn btn-sm btn-danger" onclick="excluirCliente(${linha.id})">Excluir</button>
+              <button class="btn btn-sm btn-primary-custom" onclick="carregarCliente(${linha.id})">Editar</button>
+<button class="btn btn-sm btn-primary-custom" onclick="excluirCliente(${linha.id})">Excluir</button>
             </td>
             </tr>
         `;

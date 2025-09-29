@@ -1,4 +1,6 @@
 <?php
+// NOTE: tabela usuário
+
 // NOTE: Define que a resposta será JSON
 header("Content-Type: application/json");
 

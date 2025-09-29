@@ -1,0 +1,49 @@
+:root,
+html,
+body {
+  margin: 0px;
+  height: 100%;
+  font-family: "Inter", sans-serif;
+}
+
+.logo-title {
+  font-weight: 800;
+  font-size: 4rem;
+  color: #0a0a0a;
+  letter-spacing: -0.02em;
+}
+
+.btn-primary-custom {
+  background-color: #f78a45;
+  border-color: #f78a45;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+}
+
+.btn-primary-custom:hover {
+  background-color: #e6782c;
+  border-color: #e6782c;
+}
+
+.btn-outline-custom {
+  border-color: #f78a45;
+  color: #f78a45;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+}
+
+.btn-outline-custom:hover {
+  background-color: #f78a45;
+  border-color: #f78a45;
+  color: white;
+}
+
+.feature-card {
+  border: none;
+  border-radius: 16px;
+  padding: 2rem;
+  height: 100%;
+  background-color: #f8f9fa;
+}
