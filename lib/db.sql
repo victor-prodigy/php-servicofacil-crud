@@ -1,7 +1,3 @@
--- Database: servicofacil
--- ServiçoFácil - Sistema de Contratação de Serviços
--- Baseado nos diagramas ER fornecidos
-
 USE servicofacil;
 
 -- ============================================
