@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>ServiçoFácil - Solicitar Serviço</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="../../assets/css/forms.css" rel="stylesheet" />
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top w-100">
+      <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold" href="../../index.html" style="color: #f88b45; font-size: 1.5rem;">
+          ServiçoFácil
+        </a>
+        
+        <div class="d-flex gap-2">
+          <a href="../cliente-dashboard.html" class="btn btn-outline-primary" style="border-color: #f88b45; color: #f88b45;">
+            <i class="fas fa-arrow-left me-1"></i> Voltar ao Dashboard
+          </a>
+          <a href="../login/index.html" class="btn btn-primary" style="background-color: #f88b45; border-color: #f88b45;">
+            <i class="fas fa-sign-out-alt me-1"></i> Sair
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+          <!-- Page Header -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body text-center bg-light">
+              <i class="fas fa-plus-circle text-primary mb-3" style="font-size: 3rem; color: #f88b45 !important;"></i>
+              <h2 class="card-title mb-2">Solicitar Novo Serviço</h2>
+              <p class="text-muted">Preencha os dados abaixo para solicitar um serviço</p>
+            </div>
+          </div>
+
+          <!-- Form Card -->
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <form id="solicitarServicoForm" method="POST">
+                <!-- Título do Serviço -->
+                <div class="mb-4">
+                  <label for="titulo" class="form-label fw-semibold">
+                    <i class="fas fa-heading text-primary me-2"></i>Título do Serviço
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    id="titulo"
+                    name="titulo"
+                    placeholder="Ex: Reparo de torneira na cozinha"
+                    required
+                    maxlength="100"
+                  />
+                  <div class="form-text">Descreva brevemente o serviço desejado</div>
+                </div>
+
+                <!-- Categoria -->
+                <div class="mb-4">
+                  <label for="categoria" class="form-label fw-semibold">
+                    <i class="fas fa-list text-primary me-2"></i>Categoria
+                  </label>
+                  <select class="form-select form-select-lg" id="categoria" name="categoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option value="Encanamento">🔧 Encanamento</option>
+                    <option value="Elétrica">⚡ Elétrica</option>
+                    <option value="Pintura">🎨 Pintura</option>
+                    <option value="Limpeza">🧽 Limpeza</option>
+                    <option value="Jardinagem">🌱 Jardinagem</option>
+                    <option value="Marcenaria">🪚 Marcenaria</option>
+                    <option value="Pedreiro">🧱 Pedreiro</option>
+                    <option value="Mecânica">🔩 Mecânica</option>
+                    <option value="Informática">💻 Informática</option>
+                    <option value="Outros">📋 Outros</option>
+                  </select>
+                </div>
+
+                <!-- Descrição Detalhada -->
+                <div class="mb-4">
+                  <label for="descricao" class="form-label fw-semibold">
+                    <i class="fas fa-align-left text-primary me-2"></i>Descrição Detalhada
+                  </label>
+                  <textarea
+                    class="form-control"
+                    id="descricao"
+                    name="descricao"
+                    rows="4"
+                    placeholder="Descreva detalhadamente o problema ou serviço necessário..."
+                    required
+                    maxlength="500"
+                  ></textarea>
+                  <div class="form-text">Máximo 500 caracteres</div>
+                </div>
+
+                <!-- Localização -->
+                <div class="row mb-4">
+                  <div class="col-md-8">
+                    <label for="endereco" class="form-label fw-semibold">
+                      <i class="fas fa-map-marker-alt text-primary me-2"></i>Endereço
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="endereco"
+                      name="endereco"
+                      placeholder="Rua, número, bairro"
+                      required
+                      maxlength="200"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label for="cidade" class="form-label fw-semibold">Cidade</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="cidade"
+                      name="cidade"
+                      placeholder="Ex: São Paulo"
+                      required
+                      maxlength="100"
+                    />
+                  </div>
+                </div>
+
+                <!-- Prazo e Orçamento -->
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <label for="prazo_desejado" class="form-label fw-semibold">
+                      <i class="fas fa-calendar text-primary me-2"></i>Prazo Desejado
+                    </label>
+                    <select class="form-select" id="prazo_desejado" name="prazo_desejado" required>
+                      <option value="">Selecione o prazo</option>
+                      <option value="Urgente (até 24h)">🚨 Urgente (até 24h)</option>
+                      <option value="Até 3 dias">⏰ Até 3 dias</option>
+                      <option value="Até 1 semana">📅 Até 1 semana</option>
+                      <option value="Até 2 semanas">🗓️ Até 2 semanas</option>
+                      <option value="Sem pressa">😌 Sem pressa</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="orcamento_maximo" class="form-label fw-semibold">
+                      <i class="fas fa-dollar-sign text-primary me-2"></i>Orçamento Máximo
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text">R$</span>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="orcamento_maximo"
+                        name="orcamento_maximo"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        max="99999.99"
+                      />
+                    </div>
+                    <div class="form-text">Deixe em branco se for flexível</div>
+                  </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="mb-4">
+                  <label for="observacoes" class="form-label fw-semibold">
+                    <i class="fas fa-sticky-note text-primary me-2"></i>Observações Adicionais
+                  </label>
+                  <textarea
+                    class="form-control"
+                    id="observacoes"
+                    name="observacoes"
+                    rows="3"
+                    placeholder="Informações extras, horários preferidos, materiais necessários..."
+                    maxlength="300"
+                  ></textarea>
+                  <div class="form-text">Opcional - Máximo 300 caracteres</div>
+                </div>
+
+                <!-- Alert area -->
+                <div id="alert-area" class="mb-3"></div>
+
+                <!-- Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <a href="../cliente-dashboard.html" class="btn btn-outline-secondary btn-lg me-md-2">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                  </a>
+                  <button type="submit" class="btn btn-primary btn-lg" id="submit-btn" style="background-color: #f88b45; border-color: #f88b45;">
+                    <i class="fas fa-paper-plane me-2"></i>Solicitar Serviço
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/solicitar-servico.js"></script>
+  </body>
+</html>
