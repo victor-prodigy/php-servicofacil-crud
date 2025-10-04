@@ -45,13 +45,9 @@
                     <i class="bi bi-plus-circle-fill"></i>
                     Solicitar Serviço
                   </a>
-                  <a href="./servico/servico-novo.html" class="btn btn-primary">
-                    <i class="bi bi-megaphone-fill"></i>
-                    Publicar Serviço
-                  </a>
-                  <a href="./cliente-listar.html" class="btn btn-info">
-                    <i class="bi bi-list-ul"></i>
-                    Meus Serviços
+                  <a href="#" onclick="carregarServicos()" class="btn btn-info">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Atualizar Serviços
                   </a>
                 </div>
               </div>
@@ -89,14 +85,15 @@
           </div>
         </div>
         
-        <!-- Seção de Serviços Publicados -->
+        <!-- Seção de Serviços Disponíveis (Visualização) -->
         <div class="mt-4">
           <div class="card">
             <div class="card-header">
               <h3>
-                <i class="bi bi-megaphone"></i>
-                Meus Serviços Publicados
+                <i class="bi bi-shop"></i>
+                Serviços Disponíveis
               </h3>
+              <p class="mb-0 text-muted">Explore serviços oferecidos pelos prestadores</p>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -105,7 +102,7 @@
                     <tr>
                       <th>Título</th>
                       <th>Categoria</th>
-                      <th>Orçamento</th>
+                      <th>Preço</th>
                       <th>Status</th>
                       <th>Data</th>
                       <th>Ações</th>
@@ -126,10 +123,10 @@
           <i class="bi bi-plus-circle-fill"></i>
           Solicitar Novo Serviço
         </a>
-        <a href="./servico/servico-novo.html" class="btn btn-primary">
-          <i class="bi bi-megaphone-fill"></i>
-          Publicar Serviço
-        </a>
+        <button onclick="carregarServicos()" class="btn btn-info">
+          <i class="bi bi-arrow-clockwise"></i>
+          Atualizar Lista
+        </button>
       </div>
     </div>
 

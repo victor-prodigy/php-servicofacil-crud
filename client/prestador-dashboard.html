@@ -11,8 +11,147 @@
 </head>
 
 <body>
-  <h1>Prestador Dashboard</h1>
-  <p>Bem-vindo ao seu painel, Prestador!</p>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+          <div class="container-fluid">
+            <span class="navbar-brand">ServiçoFácil</span>
+            <div class="d-flex">
+              <span class="navbar-text me-3">
+                Bem-vindo(a), <span id="userName">Carregando...</span>
+              </span>
+              <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Sair
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+    
+    <h1>Dashboard do Prestador</h1>
+    <div id="dashboardContent" style="display: none;">
+      
+      <!-- Ações Rápidas -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="bi bi-lightning-fill text-warning"></i>
+                Ações Rápidas
+              </h5>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="./servico/servico-novo.html" class="btn btn-primary">
+                  <i class="bi bi-plus-circle-fill"></i>
+                  Publicar Novo Serviço
+                </a>
+                <button onclick="carregarSolicitacoes()" class="btn btn-success">
+                  <i class="bi bi-eye-fill"></i>
+                  Ver Solicitações de Clientes
+                </button>
+                <a href="#" class="btn btn-info">
+                  <i class="bi bi-graph-up"></i>
+                  Relatórios
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Serviços Publicados (Gerenciamento) -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-tools"></i>
+                Meus Serviços Publicados
+              </h3>
+              <p class="mb-0 text-muted">Gerencie seus serviços oferecidos</p>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Categoria</th>
+                      <th>Preço</th>
+                      <th>Status</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="servicosTable">
+                    <!-- Serviços serão carregados aqui via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Seção de Solicitações de Clientes (Visualização) -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-journal-text"></i>
+                Solicitações de Serviços (Clientes)
+              </h3>
+              <p class="mb-0 text-muted">Visualize solicitações de clientes para ofertar seus serviços</p>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Categoria</th>
+                      <th>Orçamento</th>
+                      <th>Prazo</th>
+                      <th>Cidade</th>
+                      <th>Status</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="solicitacoesTable">
+                    <!-- Solicitações serão carregadas aqui via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botões de Ação Fixos -->
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+      <a href="./servico/servico-novo.html" class="btn btn-primary">
+        <i class="bi bi-plus-circle-fill"></i>
+        Publicar Novo Serviço
+      </a>
+      <button onclick="carregarSolicitacoes()" class="btn btn-success">
+        <i class="bi bi-arrow-clockwise"></i>
+        Atualizar Solicitações
+      </button>
+    </div>
+  </div>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <!-- Custom JS -->
+  <script src="../assets/js/prestador-dashboard.js"></script>
 </body>
 
 </html>
