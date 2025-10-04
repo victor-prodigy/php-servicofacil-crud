@@ -1,9 +1,13 @@
+-- ============================================
+-- DATABASE SERVICOFACIL
+-- ============================================
+CREATE DATABASE IF NOT EXISTS servicofacil;
 USE servicofacil;
 
 -- ============================================
 -- TABELA: USER (Usuário Base)
 -- ============================================
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
     `user_id` INT(11) NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(100) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
@@ -19,7 +23,7 @@ CREATE TABLE `user` (
 -- ============================================
 -- TABELA: CLIENTE (Cliente)
 -- ============================================
-CREATE TABLE `cliente` (
+CREATE TABLE IF NOT EXISTS `cliente` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `user_id` INT(11) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
@@ -33,7 +37,7 @@ CREATE TABLE `cliente` (
 -- ============================================
 -- TABELA: SERVICE_PROVIDER (Prestador de Serviço)
 -- ============================================
-CREATE TABLE `service_provider` (
+CREATE TABLE IF NOT EXISTS `service_provider` (
     `service_provider_id` INT(11) NOT NULL AUTO_INCREMENT,
     `user_id` INT(11) NOT NULL,
     `specialty` VARCHAR(50) DEFAULT NULL,
@@ -44,9 +48,28 @@ CREATE TABLE `service_provider` (
 );
 
 -- ============================================
+-- TABELA: SERVICE (Serviços Publicados pelo Prestador)
+-- ============================================
+CREATE TABLE IF NOT EXISTS `service` (
+    `service_id` INT(11) NOT NULL AUTO_INCREMENT,
+    `service_provider_id` INT(11) NOT NULL,
+    `title` VARCHAR(200) NOT NULL,
+    `description` TEXT NOT NULL,
+    `category` VARCHAR(50) NOT NULL,
+    `price` DECIMAL(10,2) NOT NULL,
+    `estimated_time` VARCHAR(50) NOT NULL,
+    `location` VARCHAR(100) NOT NULL,
+    `status` VARCHAR(20) DEFAULT 'ativo',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`service_id`),
+    KEY `fk_service_provider` (`service_provider_id`),
+    CONSTRAINT `fk_service_provider` FOREIGN KEY (`service_provider_id`) REFERENCES `service_provider` (`service_provider_id`) ON DELETE CASCADE
+);
+
+-- ============================================
 -- TABELA: SERVICE_REQUEST (Solicitação de Serviço)
 -- ============================================
-CREATE TABLE `service_request` (
+CREATE TABLE IF NOT EXISTS `service_request` (
     `request_id` INT(11) NOT NULL AUTO_INCREMENT,
     `cliente_id` INT(11) NOT NULL,
     `service_type` VARCHAR(50) NOT NULL,
@@ -63,7 +86,7 @@ CREATE TABLE `service_request` (
 -- ============================================
 -- TABELA: PROPOSAL (Proposta)
 -- ============================================
-CREATE TABLE `proposal` (
+CREATE TABLE IF NOT EXISTS `proposal` (
     `proposal_id` INT(11) NOT NULL AUTO_INCREMENT,
     `request_id` INT(11) NOT NULL,
     `service_provider_id` INT(11) NOT NULL,
@@ -81,7 +104,7 @@ CREATE TABLE `proposal` (
 -- ============================================
 -- TABELA: CONTRACT (Contrato)
 -- ============================================
-CREATE TABLE `contract` (
+CREATE TABLE IF NOT EXISTS `contract` (
     `contract_id` INT(11) NOT NULL AUTO_INCREMENT,
     `request_id` INT(11) NOT NULL,
     `service_provider_id` INT(11) NOT NULL,
@@ -101,7 +124,7 @@ CREATE TABLE `contract` (
 -- ============================================
 -- TABELA: PAYMENT (Pagamento)
 -- ============================================
-CREATE TABLE `payment` (
+CREATE TABLE IF NOT EXISTS `payment` (
     `payment_id` INT(11) NOT NULL AUTO_INCREMENT,
     `contract_id` INT(11) NOT NULL,
     `amount` DECIMAL(10,2) NOT NULL,
@@ -116,7 +139,7 @@ CREATE TABLE `payment` (
 -- ============================================
 -- TABELA: REVIEW (Avaliação)
 -- ============================================
-CREATE TABLE `review` (
+CREATE TABLE IF NOT EXISTS `review` (
     `review_id` INT(11) NOT NULL AUTO_INCREMENT,
     `contract_id` INT(11) NOT NULL,
     `cliente_id` INT(11) NOT NULL,
@@ -131,9 +154,9 @@ CREATE TABLE `review` (
 );
 
 -- ============================================
--- TABELA: CHAT (Chat/Mensagens)
+-- TABELA: CHAT (Mensagens)
 -- ============================================
-CREATE TABLE `chat` (
+CREATE TABLE IF NOT EXISTS `chat` (
     `chat_id` INT(11) NOT NULL AUTO_INCREMENT,
     `cliente_id` INT(11) NOT NULL,
     `service_provider_id` INT(11) NOT NULL,

@@ -13,12 +13,13 @@ try {
     $usuario_tipo = $_SESSION['usuario_tipo'];
 
     if ($usuario_tipo === 'cliente') {
-        // Mostrar todos os serviços (propostas) disponíveis para contratação
+        // Mostrar todos os serviços disponíveis para contratação
         $sql = "
             SELECT 
                 p.proposal_id,
                 sr.request_id,
                 sr.service_type AS titulo,
+                sr.service_type AS categoria,
                 sr.location AS localizacao,
                 sr.budget AS preco,
                 sr.deadline AS prazo,
@@ -27,8 +28,7 @@ try {
                 sp.specialty AS prestador_especialidade,
                 p.amount AS valor_proposta,
                 p.message AS descricao,
-                p.submitted_at AS data_postagem,
-                p.estimate AS status
+                p.submitted_at AS data_postagem
             FROM proposal p
             INNER JOIN service_request sr ON p.request_id = sr.request_id
             INNER JOIN service_provider sp ON p.service_provider_id = sp.service_provider_id
@@ -37,7 +37,6 @@ try {
         ";
 
         $result = $conn->query($sql);
-
         $servicos = [];
         while ($row = $result->fetch_assoc()) {
             $servicos[] = $row;
@@ -55,6 +54,7 @@ try {
                 p.proposal_id,
                 sr.request_id,
                 sr.service_type AS titulo,
+                sr.service_type AS categoria,
                 sr.location AS localizacao,
                 sr.budget AS preco,
                 sr.deadline AS prazo,
@@ -63,8 +63,7 @@ try {
                 sp.specialty AS prestador_especialidade,
                 p.amount AS valor_proposta,
                 p.message AS descricao,
-                p.submitted_at AS data_postagem,
-                p.estimate AS status
+                p.submitted_at AS data_postagem
             FROM proposal p
             INNER JOIN service_request sr ON p.request_id = sr.request_id
             INNER JOIN service_provider sp ON p.service_provider_id = sp.service_provider_id
@@ -88,6 +87,7 @@ try {
             'servicos' => $servicos,
         ]);
         $stmt->close();
+
     } else {
         echo json_encode(['success' => false, 'message' => 'Tipo de usuário não reconhecido']);
     }
