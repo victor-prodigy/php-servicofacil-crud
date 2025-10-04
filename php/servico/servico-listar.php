@@ -2,99 +2,91 @@
 session_start();
 require_once __DIR__ . '/../conexao.php';
 
-// Verificar se o usuário está logado
-if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['usuario_tipo'])) {
-    echo json_encode(['success' => false, 'message' => 'Acesso não autorizado']);
-    exit;
-}
+header('Content-Type: application/json');
 
 try {
+    if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['usuario_tipo'])) {
+        echo json_encode(['success' => false, 'message' => 'Acesso não autorizado']);
+        exit;
+    }
+
     $usuario_tipo = $_SESSION['usuario_tipo'];
-    
+
     if ($usuario_tipo === 'cliente') {
-        // CLIENTES: Visualizam todos os serviços publicados pelos prestadores (para contratar)
-        $query = "SELECT 
-                    s.id,
-                    s.titulo,
-                    s.categoria,
-                    s.descricao,
-                    s.preco as orcamento,
-                    s.prazo,
-                    s.localizacao,
-                    s.status,
-                    s.data_postagem,
-                    u.name as prestador_nome,
-                    sp.specialty as prestador_especialidade
-                  FROM servicos s
-                  INNER JOIN service_provider sp ON s.prestador_id = sp.service_provider_id
-                  INNER JOIN user u ON sp.user_id = u.user_id
-                  WHERE s.status = 'ativo'
-                  ORDER BY s.data_postagem DESC";
-        
-        $result = $conn->query($query);
+        // Mostrar todos os serviços (propostas) disponíveis para contratação
+        $sql = "
+            SELECT 
+                p.proposal_id,
+                sr.request_id,
+                sr.service_type AS titulo,
+                sr.location AS localizacao,
+                sr.budget AS preco,
+                sr.deadline AS prazo,
+                sp.service_provider_id,
+                u.name AS prestador_nome,
+                sp.specialty AS prestador_especialidade,
+                p.amount AS valor_proposta,
+                p.message AS descricao,
+                p.submitted_at AS data_postagem,
+                p.estimate AS status
+            FROM proposal p
+            INNER JOIN service_request sr ON p.request_id = sr.request_id
+            INNER JOIN service_provider sp ON p.service_provider_id = sp.service_provider_id
+            INNER JOIN user u ON sp.user_id = u.user_id
+            ORDER BY p.submitted_at DESC
+        ";
+
+        $result = $conn->query($sql);
+
         $servicos = [];
-        
         while ($row = $result->fetch_assoc()) {
             $servicos[] = $row;
         }
-        
+
         echo json_encode([
             'success' => true,
             'servicos' => $servicos,
-            'tipo' => 'visualizacao'
         ]);
-        
+
     } else if ($usuario_tipo === 'prestador') {
-        // PRESTADORES: Gerenciam apenas seus próprios serviços
-        // Primeiro, encontrar o service_provider_id do usuário logado
-        $findProvider = "SELECT service_provider_id FROM service_provider 
-                        INNER JOIN user ON service_provider.user_id = user.user_id 
-                        WHERE user.user_id = (SELECT user_id FROM user WHERE user_id = ?)";
-        
-        $stmt = $conn->prepare($findProvider);
+        // Prestador visualiza apenas suas próprias propostas
+        $sql = "
+            SELECT 
+                p.proposal_id,
+                sr.request_id,
+                sr.service_type AS titulo,
+                sr.location AS localizacao,
+                sr.budget AS preco,
+                sr.deadline AS prazo,
+                sp.service_provider_id,
+                u.name AS prestador_nome,
+                sp.specialty AS prestador_especialidade,
+                p.amount AS valor_proposta,
+                p.message AS descricao,
+                p.submitted_at AS data_postagem,
+                p.estimate AS status
+            FROM proposal p
+            INNER JOIN service_request sr ON p.request_id = sr.request_id
+            INNER JOIN service_provider sp ON p.service_provider_id = sp.service_provider_id
+            INNER JOIN user u ON sp.user_id = u.user_id
+            WHERE sp.user_id = ?
+            ORDER BY p.submitted_at DESC
+        ";
+
+        $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $_SESSION['usuario_id']);
         $stmt->execute();
-        $providerResult = $stmt->get_result();
-        
-        if ($providerResult->num_rows === 0) {
-            echo json_encode(['success' => false, 'message' => 'Prestador não encontrado']);
-            exit;
-        }
-        
-        $providerRow = $providerResult->fetch_assoc();
-        $prestador_id = $providerRow['service_provider_id'];
-        
-        // Buscar serviços do prestador logado
-        $query = "SELECT 
-                    id,
-                    titulo,
-                    categoria,
-                    descricao,
-                    preco as orcamento,
-                    prazo,
-                    localizacao,
-                    status,
-                    data_postagem
-                  FROM servicos 
-                  WHERE prestador_id = ? 
-                  ORDER BY data_postagem DESC";
-        
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $prestador_id);
-        $stmt->execute();
         $result = $stmt->get_result();
-        
+
         $servicos = [];
         while ($row = $result->fetch_assoc()) {
             $servicos[] = $row;
         }
-        
+
         echo json_encode([
             'success' => true,
             'servicos' => $servicos,
-            'tipo' => 'gerenciamento'
         ]);
-        
         $stmt->close();
     } else {
         echo json_encode(['success' => false, 'message' => 'Tipo de usuário não reconhecido']);
