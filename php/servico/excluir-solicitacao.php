@@ -36,7 +36,7 @@ $solicitacao_id = (int)$_POST['solicitacao_id'];
 
 try {
     // Verificar se a solicitação existe e pertence ao cliente logado
-    $sql = "SELECT id, titulo FROM solicitacoes_servico WHERE id = ? AND cliente_id = ?";
+    $sql = "SELECT request_id, titulo FROM service_request WHERE request_id = ? AND cliente_id = ?";
     $stmt = $conexao->prepare($sql);
     
     if (!$stmt) {
@@ -65,7 +65,7 @@ try {
     $stmt->close();
     
     // Excluir a solicitação
-    $sql = "DELETE FROM solicitacoes_servico WHERE id = ? AND cliente_id = ?";
+    $sql = "DELETE FROM service_request WHERE request_id = ? AND cliente_id = ?";
     $stmt = $conexao->prepare($sql);
     
     if (!$stmt) {

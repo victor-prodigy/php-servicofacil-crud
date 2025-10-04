@@ -108,8 +108,8 @@ try {
     $dados['observacoes'] = null;
   }
 
-  // Preparar SQL para inserção
-  $sql = "INSERT INTO solicitacoes_servico (
+    // Preparar SQL para inserção
+    $sql = "INSERT INTO service_request (
                 cliente_id, 
                 titulo, 
                 categoria, 
@@ -120,10 +120,8 @@ try {
                 orcamento_maximo, 
                 observacoes, 
                 status, 
-                data_criacao
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NOW())";
-
-  $stmt = $conexao->prepare($sql);
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NOW())";  $stmt = $conexao->prepare($sql);
 
   if (!$stmt) {
     throw new Exception('Erro na preparação da consulta: ' . $conexao->error);

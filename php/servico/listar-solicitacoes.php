@@ -15,7 +15,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'cliente') 
 try {
     // Preparar consulta para buscar solicitações do cliente logado
     $sql = "SELECT 
-                id,
+                request_id as id,
                 titulo,
                 categoria,
                 descricao,
@@ -25,11 +25,11 @@ try {
                 orcamento_maximo,
                 observacoes,
                 status,
-                data_criacao,
+                created_at as data_criacao,
                 data_atualizacao
-            FROM solicitacoes_servico 
+            FROM service_request 
             WHERE cliente_id = ? 
-            ORDER BY data_criacao DESC";
+            ORDER BY created_at DESC";
     
     $stmt = $conexao->prepare($sql);
     
