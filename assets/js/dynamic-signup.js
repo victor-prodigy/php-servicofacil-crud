@@ -5,7 +5,7 @@
 
 let currentUserType = 'customer';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeDynamicForm();
     setupProfileSelection();
     setupFormSubmission();
@@ -40,7 +40,7 @@ function setupProfileSelection() {
  */
 function switchUserType(userType) {
     currentUserType = userType;
-    
+
     const clienteCard = document.getElementById('cliente-card');
     const prestadorCard = document.getElementById('prestador-card');
     const clienteFields = document.getElementById('cliente-fields');
@@ -48,55 +48,59 @@ function switchUserType(userType) {
     const userTypeInput = document.getElementById('user_type');
     const submitBtn = document.getElementById('submit-btn');
     const signinLink = document.getElementById('signin-link');
-    
+
     // Remover classes ativas
     clienteCard.classList.remove('active', 'inactive');
     prestadorCard.classList.remove('active', 'inactive');
-    
+
     if (userType === 'customer') {
         // Ativar cliente
         clienteCard.classList.add('active');
         prestadorCard.classList.add('inactive');
-        
+
         // Mostrar campos do cliente
         clienteFields.style.display = 'block';
         prestadorFields.style.display = 'none';
-        
+
         // Atualizar campos obrigatórios
         setFieldsRequired(true, ['phone_number']);
         setFieldsRequired(false, ['specialty', 'location']);
-        
+
         // Atualizar form action e textos
         userTypeInput.value = 'customer';
         submitBtn.textContent = 'Cadastrar como Cliente';
-        signinLink.href = 'signin.html';
-        
+        if (signinLink) {
+            signinLink.href = '../login/index.html';
+        }
+
         // Limpar campos do prestador
         document.getElementById('specialty').value = '';
         document.getElementById('location').value = '';
-        
+
     } else if (userType === 'service_provider') {
         // Ativar prestador
         prestadorCard.classList.add('active');
         clienteCard.classList.add('inactive');
-        
+
         // Mostrar campos do prestador
         clienteFields.style.display = 'none';
         prestadorFields.style.display = 'block';
-        
+
         // Atualizar campos obrigatórios
         setFieldsRequired(false, ['phone_number']);
         setFieldsRequired(true, ['specialty', 'location']);
-        
+
         // Atualizar form action e textos
         userTypeInput.value = 'service_provider';
         submitBtn.textContent = 'Cadastrar como Prestador';
-        signinLink.href = 'signin.html';
-        
+        if (signinLink) {
+            signinLink.href = '../login/index.html';
+        }
+
         // Limpar campo do cliente
         document.getElementById('phone_number').value = '';
     }
-    
+
     // Adicionar animação suave
     setTimeout(() => {
         const visibleFields = userType === 'customer' ? clienteFields : prestadorFields;
@@ -128,8 +132,8 @@ function setFieldsRequired(required, fieldNames) {
  */
 function setupFormSubmission() {
     const form = document.getElementById('dynamicSignupForm');
-    
-    form.addEventListener('submit', function(e) {
+
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
         handleFormSubmission();
     });
@@ -143,57 +147,57 @@ function handleFormSubmission() {
     const formData = new FormData(form);
     const submitButton = document.getElementById('submit-btn');
     const alertArea = document.getElementById('alert-area');
-    
+
     // Validar senhas
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
-    
+
     if (password !== confirmPassword) {
         showAlert('danger', 'As senhas não coincidem', alertArea);
         return;
     }
-    
+
     // Determinar endpoint baseado no tipo de usuário
-    const endpoint = '../app/universal-signup.php';
-    
+    const endpoint = '../../php/universal-signup.php';
+
     // Show loading state
     const originalText = submitButton.textContent;
     submitButton.textContent = 'Cadastrando...';
     submitButton.disabled = true;
-    
+
     // Clear previous alerts
     alertArea.innerHTML = '';
-    
+
     fetch(endpoint, {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show success message
-            showAlert('success', data.message, alertArea);
-            
-            // Reset form after success
-            setTimeout(() => {
-                form.reset();
-                // Redirect to unified signin page
-                window.location.href = 'signin.html';
-            }, 2000);
-        } else {
-            // Show error message
-            showAlert('danger', data.error, alertArea);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'Erro de conexão. Tente novamente.', alertArea);
-    })
-    .finally(() => {
-        // Reset button state
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showAlert('success', data.message, alertArea);
+
+                // Reset form after success
+                setTimeout(() => {
+                    form.reset();
+                    // Redirect to unified login page
+                    window.location.href = '../login/index.html';
+                }, 2000);
+            } else {
+                // Show error message
+                showAlert('danger', data.error, alertArea);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Erro de conexão. Tente novamente.', alertArea);
+        })
+        .finally(() => {
+            // Reset button state
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
 }
 
 /**
@@ -202,7 +206,7 @@ function handleFormSubmission() {
 function showAlert(type, message, container) {
     const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
     const iconClass = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
-    
+
     const alertHTML = `
         <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
             <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="${type}:">
@@ -212,9 +216,9 @@ function showAlert(type, message, container) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `;
-    
+
     container.innerHTML = alertHTML;
-    
+
     // Add Bootstrap icons if not already present
     if (!document.getElementById('bootstrap-icons')) {
         const iconsHTML = `
@@ -227,7 +231,7 @@ function showAlert(type, message, container) {
                 </symbol>
             </svg>
         `;
-        
+
         const div = document.createElement('div');
         div.id = 'bootstrap-icons';
         div.innerHTML = iconsHTML;

@@ -93,8 +93,8 @@ function handleFormSubmission() {
 
   // Determinar endpoint baseado no tipo de usuário
   const endpoint = currentUserType === 'customer' ?
-    '../app/cliente-signin.php' :
-    '../app/prestador-signin.php';
+    '../../php/cliente-signin.php' :
+    '../../php/prestador-signin.php';
 
   // Show loading state
   const originalText = submitButton.textContent;
