@@ -186,7 +186,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: dadosForm
             });
 
-            const resultado = await response.json();
+            // Verificar se a resposta é JSON válido
+            let resultado;
+            try {
+                resultado = await response.json();
+            } catch (jsonError) {
+                console.error('Erro ao parsear JSON:', jsonError);
+                throw new Error('Resposta inválida do servidor');
+            }
 
             if (response.ok && resultado.sucesso) {
                 mostrarAlerta('sucesso', 'Sucesso!', resultado.mensagem);
@@ -203,9 +210,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 3000);
 
             } else {
-                const mensagemErro = resultado.detalhes ? 
-                    resultado.detalhes.join(', ') : 
-                    resultado.erro || 'Erro desconhecido';
+                // Tratar diferentes tipos de erro
+                let mensagemErro = 'Erro desconhecido';
+                
+                if (resultado.erro) {
+                    mensagemErro = resultado.erro;
+                    if (resultado.detalhes && Array.isArray(resultado.detalhes)) {
+                        mensagemErro += ': ' + resultado.detalhes.join(', ');
+                    } else if (resultado.detalhes) {
+                        mensagemErro += ': ' + resultado.detalhes;
+                    }
+                }
+                
+                // Verificar se é erro de autenticação
+                if (response.status === 401) {
+                    mensagemErro = 'Sessão expirada. Faça login novamente.';
+                    setTimeout(() => {
+                        window.location.href = '../login/index.html';
+                    }, 2000);
+                }
                 
                 mostrarAlerta('erro', 'Erro:', mensagemErro);
             }
