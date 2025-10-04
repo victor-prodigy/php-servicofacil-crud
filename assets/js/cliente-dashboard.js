@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     checkAuthentication();
 });
 
@@ -17,7 +17,7 @@ async function checkAuthentication() {
         // Se estiver autenticado, mostra o conteúdo e atualiza o nome do usuário
         document.getElementById('userName').textContent = data.nome;
         document.getElementById('dashboardContent').style.display = 'block';
-        
+
         // Carregar a lista de serviços e solicitações
         carregarServicos();
         carregarSolicitacoes();
@@ -52,13 +52,13 @@ async function carregarServicos() {
 
         data.servicos.forEach(servico => {
             const row = document.createElement('tr');
-            
+
             // Formatar data
             const data = new Date(servico.data_postagem).toLocaleDateString('pt-BR');
-            
+
             // Definir classe do status
             const statusClass = getStatusClass(servico.status);
-            
+
             // Formatar orçamento
             const orcamento = new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
@@ -136,7 +136,7 @@ async function excluirServico(id) {
 function logout() {
     // Limpar dados da sessão no localStorage
     localStorage.clear();
-    
+
     // Fazer requisição para destruir a sessão no servidor
     fetch('../php/logout.php')
         .then(() => {
@@ -178,12 +178,12 @@ async function carregarSolicitacoes() {
         // Adicionar cada solicitação à tabela
         data.solicitacoes.forEach(solicitacao => {
             const row = document.createElement('tr');
-            
+
             const dataFormatada = new Date(solicitacao.data_criacao).toLocaleDateString('pt-BR');
-            const orcamento = solicitacao.orcamento_maximo ? 
-                `R$ ${parseFloat(solicitacao.orcamento_maximo).toFixed(2)}` : 
+            const orcamento = solicitacao.orcamento_maximo ?
+                `R$ ${parseFloat(solicitacao.orcamento_maximo).toFixed(2)}` :
                 'Flexível';
-            
+
             row.innerHTML = `
                 <td>
                     <strong>${solicitacao.titulo}</strong>
@@ -225,7 +225,7 @@ async function carregarSolicitacoes() {
                     </div>
                 </td>
             `;
-            
+
             tableBody.appendChild(row);
         });
 
@@ -302,5 +302,4 @@ async function excluirSolicitacao(id) {
         console.error('Erro ao excluir solicitação:', error);
         alert('Erro ao excluir solicitação: ' + error.message);
     }
-}
 }
