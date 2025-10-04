@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Incluir arquivo de conexão
-require_once 'conexao.php';
+require_once __DIR__ . '/../conexao.php';
 
 try {
     // Receber e validar dados do formulário
@@ -43,25 +43,25 @@ try {
         throw new Exception('Senha é obrigatória');
     }
 
-    if ($user_type !== 'service_provider') {
-        throw new Exception('Tipo de usuário inválido');
+    if ($user_type !== 'prestador' && $user_type !== 'service_provider') {
+        throw new Exception('Tipo de usuário inválido para prestador');
     }
 
-    // Buscar usuário na tabela service_provider
+    // Buscar usuário na tabela service_provider através do JOIN com user
     $stmt = $pdo->prepare("
         SELECT 
             sp.service_provider_id,
             sp.user_id,
-            sp.email,
-            sp.password,
-            sp.name,
+            u.email,
+            u.password,
+            u.name,
             sp.specialty,
             sp.location,
-            sp.identity_verified,
+            u.identity_verified,
             u.created_at
         FROM service_provider sp
         INNER JOIN user u ON sp.user_id = u.user_id
-        WHERE sp.email = ?
+        WHERE u.email = ?
     ");
     $stmt->execute([$email]);
     $service_provider = $stmt->fetch();
@@ -76,10 +76,10 @@ try {
     }
 
     // Login bem-sucedido - criar sessão
-    $_SESSION['user_id'] = $service_provider['user_id'];
+    $_SESSION['usuario_id'] = $service_provider['user_id'];
     $_SESSION['service_provider_id'] = $service_provider['service_provider_id'];
-    $_SESSION['user_type'] = 'service_provider';
-    $_SESSION['name'] = $service_provider['name'];
+    $_SESSION['usuario_tipo'] = 'prestador';
+    $_SESSION['nome'] = $service_provider['name'];
     $_SESSION['email'] = $service_provider['email'];
     $_SESSION['specialty'] = $service_provider['specialty'];
     $_SESSION['location'] = $service_provider['location'];
@@ -92,11 +92,11 @@ try {
         'data' => [
             'user_id' => $service_provider['user_id'],
             'service_provider_id' => $service_provider['service_provider_id'],
-            'name' => $service_provider['name'],
+            'nome' => $service_provider['name'],
             'email' => $service_provider['email'],
             'specialty' => $service_provider['specialty'],
             'location' => $service_provider['location'],
-            'user_type' => 'service_provider',
+            'usuario_tipo' => 'prestador',
             'identity_verified' => $service_provider['identity_verified'],
             'redirect_url' => '../client/prestador-dashboard.html'
         ]

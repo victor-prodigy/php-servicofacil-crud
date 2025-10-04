@@ -110,7 +110,13 @@ try {
       throw new Exception('Este e-mail já está cadastrado como cliente');
     }
   } elseif ($user_type === 'service_provider') {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM service_provider WHERE email = ?");
+    // Verificar na tabela service_provider através do JOIN com user
+    $stmt = $pdo->prepare("
+      SELECT COUNT(*) 
+      FROM service_provider sp 
+      INNER JOIN user u ON sp.user_id = u.user_id 
+      WHERE u.email = ?
+    ");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
       throw new Exception('Este e-mail já está cadastrado como prestador');
@@ -153,10 +159,10 @@ try {
     $success_message = 'Cliente cadastrado com sucesso!';
   } elseif ($user_type === 'service_provider') {
     $stmt = $pdo->prepare("
-            INSERT INTO service_provider (user_id, email, password, name, specialty, location, identity_verified) 
-            VALUES (?, ?, ?, ?, ?, ?, FALSE)
+            INSERT INTO service_provider (user_id, specialty, location) 
+            VALUES (?, ?, ?)
         ");
-    $stmt->execute([$user_id, $email, $hashed_password, $name, $specialty, $location]);
+    $stmt->execute([$user_id, $specialty, $location]);
     $service_provider_id = $pdo->lastInsertId();
 
     $response_data['service_provider_id'] = $service_provider_id;
