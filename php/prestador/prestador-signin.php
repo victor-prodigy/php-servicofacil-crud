@@ -98,7 +98,7 @@ try {
             'location' => $service_provider['location'],
             'usuario_tipo' => 'prestador',
             'identity_verified' => $service_provider['identity_verified'],
-            'redirect_url' => '../client/prestador-dashboard.html'
+            'redirect_url' => '../prestador-dashboard.html'
         ]
     ]);
 } catch (Exception $e) {
