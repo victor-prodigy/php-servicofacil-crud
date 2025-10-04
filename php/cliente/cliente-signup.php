@@ -66,8 +66,8 @@ try {
     throw new Exception('Este e-mail já está cadastrado');
   }
 
-  // Verificar na tabela customer também
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM customer WHERE email = ?");
+  // Verificar na tabela cliente também
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM cliente WHERE email = ?");
   $stmt->execute([$email]);
   if ($stmt->fetchColumn() > 0) {
     throw new Exception('Este e-mail já está cadastrado como cliente');
@@ -87,12 +87,12 @@ try {
   $stmt->execute([$email, $hashed_password, $name, $phone_number]);
   $user_id = $pdo->lastInsertId();
 
-  // Inserir na tabela customer
+  // Inserir na tabela cliente
   $stmt = $pdo->prepare("
-        INSERT INTO customer (user_id, email, password, name, phone_number, identity_verified) 
-        VALUES (?, ?, ?, ?, ?, FALSE)
+        INSERT INTO cliente (user_id, email, senha) 
+        VALUES (?, ?, ?)
     ");
-  $stmt->execute([$user_id, $email, $hashed_password, $name, $phone_number]);
+  $stmt->execute([$user_id, $email, $hashed_password]);
   $customer_id = $pdo->lastInsertId();
 
   // Confirmar transação

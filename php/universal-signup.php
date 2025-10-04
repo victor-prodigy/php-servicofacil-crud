@@ -104,7 +104,7 @@ try {
 
   // Verificar se o e-mail já existe nas tabelas específicas
   if ($user_type === 'customer') {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM customer WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM cliente WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
       throw new Exception('Este e-mail já está cadastrado como cliente');
@@ -142,10 +142,10 @@ try {
   // Inserir na tabela específica baseada no tipo
   if ($user_type === 'customer') {
     $stmt = $pdo->prepare("
-            INSERT INTO customer (user_id, email, password, name, phone_number, identity_verified) 
-            VALUES (?, ?, ?, ?, ?, FALSE)
+            INSERT INTO cliente (user_id, email, senha) 
+            VALUES (?, ?, ?)
         ");
-    $stmt->execute([$user_id, $email, $hashed_password, $name, $phone_number]);
+    $stmt->execute([$user_id, $email, $hashed_password]);
     $customer_id = $pdo->lastInsertId();
 
     $response_data['customer_id'] = $customer_id;

@@ -20,6 +20,7 @@ try {
 
     // Manter compatibilidade com código antigo (mysqli)
     $conn = new mysqli($host, $username, $password, $dbname);
+    $conexao = $conn; // Alias para compatibilidade
 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);

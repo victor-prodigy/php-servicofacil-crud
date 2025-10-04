@@ -47,18 +47,18 @@ try {
         throw new Exception('Tipo de usuário inválido');
     }
 
-    // Buscar usuário na tabela customer
+    // Buscar usuário na tabela cliente
     $stmt = $pdo->prepare("
         SELECT 
-            c.customer_id,
+            c.id as customer_id,
             c.user_id,
             c.email,
-            c.password,
-            c.name,
-            c.phone_number,
-            c.identity_verified,
+            c.senha as password,
+            u.name,
+            u.phone_number,
+            u.identity_verified,
             u.created_at
-        FROM customer c
+        FROM cliente c
         INNER JOIN user u ON c.user_id = u.user_id
         WHERE c.email = ?
     ");
