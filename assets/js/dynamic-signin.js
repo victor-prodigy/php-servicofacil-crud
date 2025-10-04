@@ -93,8 +93,8 @@ function handleFormSubmission() {
 
   // Determinar endpoint baseado no tipo de usuário
   const endpoint = currentUserType === 'customer' ?
-    '../../php/cliente-signin.php' :
-    '../../php/prestador-signin.php';
+    '../../php/cliente/cliente-signin.php' :
+    '../../php/prestador/prestador-signin.php';
 
   // Show loading state
   const originalText = submitButton.textContent;
@@ -121,8 +121,8 @@ function handleFormSubmission() {
           } else {
             // Fallback redirect
             const redirectUrl = currentUserType === 'customer' ?
-              'cliente-dashboard.html' :
-              'prestador-dashboard.html';
+              '../cliente-dashboard.html' :
+              '../prestador-dashboard.html';
             window.location.href = redirectUrl;
           }
         }, 1500);

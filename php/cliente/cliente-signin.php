@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Incluir arquivo de conexão
-require_once 'conexao.php';
+require_once '../conexao.php';
 
 try {
     // Receber e validar dados do formulário
@@ -76,8 +76,11 @@ try {
 
     // Login bem-sucedido - criar sessão
     $_SESSION['user_id'] = $customer['user_id'];
+    $_SESSION['usuario_id'] = $customer['customer_id']; // ID específico do cliente
     $_SESSION['customer_id'] = $customer['customer_id'];
-    $_SESSION['user_type'] = 'customer';
+    $_SESSION['user_type'] = 'cliente';
+    $_SESSION['usuario_tipo'] = 'cliente';
+    $_SESSION['nome'] = $customer['name'];
     $_SESSION['name'] = $customer['name'];
     $_SESSION['email'] = $customer['email'];
     $_SESSION['identity_verified'] = $customer['identity_verified'];
@@ -91,9 +94,9 @@ try {
             'customer_id' => $customer['customer_id'],
             'name' => $customer['name'],
             'email' => $customer['email'],
-            'user_type' => 'customer',
+            'user_type' => 'cliente',
             'identity_verified' => $customer['identity_verified'],
-            'redirect_url' => '../client/cliente-dashboard.html'
+            'redirect_url' => '../cliente-dashboard.html'
         ]
     ]);
 } catch (Exception $e) {
