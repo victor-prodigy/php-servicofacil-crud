@@ -8,17 +8,14 @@ async function checkAuthentication() {
         const data = await response.json();
 
         if (!data.authenticated) {
-            // Se não estiver autenticado, redireciona para a página de login
             alert(data.message);
             window.location.href = './login/index.html';
             return;
         }
 
-        // Se estiver autenticado, mostra o conteúdo e atualiza o nome do usuário
         document.getElementById('userName').textContent = data.nome;
         document.getElementById('dashboardContent').style.display = 'block';
 
-        // Carregar a lista de serviços (próprios) e solicitações (visualização)
         carregarServicos();
         carregarSolicitacoes();
 
@@ -31,7 +28,7 @@ async function checkAuthentication() {
 
 async function carregarServicos() {
     try {
-        const response = await fetch('../php/servico/servico-listar.php');
+        const response = await fetch('/php-servicofacil-crud/php/prestador/prestador-service-listar.php');
         const data = await response.json();
 
         if (!data.success) {
@@ -39,7 +36,7 @@ async function carregarServicos() {
         }
 
         const tableBody = document.getElementById('servicosTable');
-        tableBody.innerHTML = ''; // Limpar tabela
+        tableBody.innerHTML = '';
 
         if (data.servicos.length === 0) {
             tableBody.innerHTML = `
@@ -60,13 +57,8 @@ async function carregarServicos() {
         data.servicos.forEach(servico => {
             const row = document.createElement('tr');
 
-            // Formatar data
             const data_formatada = new Date(servico.data_postagem).toLocaleDateString('pt-BR');
-
-            // Definir classe do status
             const statusClass = getStatusClass(servico.status);
-
-            // Formatar preço
             const preco = servico.orcamento ? 
                 new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
@@ -131,7 +123,7 @@ async function carregarSolicitacoes() {
         const data = await response.json();
 
         const tableBody = document.getElementById('solicitacoesTable');
-        tableBody.innerHTML = ''; // Limpar tabela
+        tableBody.innerHTML = '';
 
         if (!data.success || data.solicitacoes.length === 0) {
             tableBody.innerHTML = `
@@ -145,7 +137,6 @@ async function carregarSolicitacoes() {
             return;
         }
 
-        // Adicionar cada solicitação à tabela
         data.solicitacoes.forEach(solicitacao => {
             const row = document.createElement('tr');
 
@@ -211,7 +202,6 @@ async function carregarSolicitacoes() {
     }
 }
 
-// Funções auxiliares para status dos serviços
 function getStatusClass(status) {
     const statusClasses = {
         'ativo': 'bg-success',
@@ -230,7 +220,6 @@ function getStatusText(status) {
     return statusTexts[status] || 'Desconhecido';
 }
 
-// Funções auxiliares para status das solicitações
 function getStatusClassSolicitacao(status) {
     const statusClasses = {
         'pendente': 'bg-warning text-dark',
@@ -251,7 +240,6 @@ function getStatusTextSolicitacao(status) {
     return statusTexts[status] || 'Desconhecido';
 }
 
-// Funções para ações dos serviços
 function verDetalhesServico(id) {
     alert(`Ver detalhes do serviço ${id} - Funcionalidade em desenvolvimento`);
 }
@@ -278,7 +266,7 @@ async function excluirServico(id) {
 
         if (data.success) {
             alert('Serviço excluído com sucesso!');
-            carregarServicos(); // Recarregar a tabela
+            carregarServicos();
         } else {
             throw new Error(data.message);
         }
@@ -289,7 +277,6 @@ async function excluirServico(id) {
     }
 }
 
-// Funções para ações das solicitações
 function verDetalhesSolicitacao(id) {
     alert(`Ver detalhes da solicitação ${id} - Funcionalidade em desenvolvimento`);
 }
@@ -299,18 +286,14 @@ function oferecerOrcamento(id) {
 }
 
 function logout() {
-    // Limpar dados da sessão no localStorage
     localStorage.clear();
 
-    // Fazer requisição para destruir a sessão no servidor
     fetch('../php/logout.php')
         .then(() => {
-            // Redirecionar para a página de login
             window.location.href = './login/index.html';
         })
         .catch(error => {
             console.error('Erro ao fazer logout:', error);
-            // Mesmo com erro, redireciona para garantir que o usuário saia
             window.location.href = './login/index.html';
         });
 }
