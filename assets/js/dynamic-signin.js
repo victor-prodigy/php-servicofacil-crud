@@ -1,182 +1,193 @@
 /**
- * Dynamic Signin JavaScript
- * Gerencia o formulário dinâmico de login único
+ * ✅ SISTEMA DE LOGIN UNIFICADO
+ * Gerencia autenticação de Cliente e Prestador
  */
 
-let currentUserType = 'customer';
+// 🎯 Variável global: tipo de usuário ativo
+let userType = 'cliente';
 
-document.addEventListener('DOMContentLoaded', function () {
-  initializeDynamicForm();
-  setupProfileSelection();
-  setupFormSubmission();
-});
+// 🚀 Inicialização automática quando página carrega
+document.addEventListener('DOMContentLoaded', initializeLoginForm);
 
 /**
- * Inicializa o formulário dinâmico
+ * 🔧 Configura o formulário de login
  */
-function initializeDynamicForm() {
-  // Definir cliente como padrão
-  switchUserType('customer');
+function initializeLoginForm() {
+  setUserType('cliente');     // Cliente como padrão
+  setupUserSelection();       // Configurar seleção de perfil
+  setupFormHandler();         // Configurar envio do formulário
 }
 
 /**
- * Configura a seleção de perfil
+ * 👥 Configura seleção entre Cliente e Prestador
  */
-function setupProfileSelection() {
+function setupUserSelection() {
+  document.getElementById('cliente-card').onclick = () => setUserType('cliente');
+  document.getElementById('prestador-card').onclick = () => setUserType('service_provider');
+}
+
+/**
+ * 🔄 Define o tipo de usuário ativo
+ */
+function setUserType(type) {
+  userType = type;
+
+  const isClient = (type === 'cliente');
+
+  // Atualizar interface visual
+  updateCardStyles(isClient);
+  updateFormElements(isClient);
+}
+
+/**
+ * 🎨 Atualiza estilos dos cartões de seleção
+ */
+function updateCardStyles(isClient) {
   const clienteCard = document.getElementById('cliente-card');
   const prestadorCard = document.getElementById('prestador-card');
 
-  clienteCard.addEventListener('click', () => {
-    switchUserType('customer');
-  });
-
-  prestadorCard.addEventListener('click', () => {
-    switchUserType('service_provider');
-  });
+  clienteCard.className = isClient ? 'profile-card active' : 'profile-card inactive';
+  prestadorCard.className = isClient ? 'profile-card inactive' : 'profile-card active';
 }
 
 /**
- * Alterna entre os tipos de usuário
+ * 📝 Atualiza elementos do formulário
  */
-function switchUserType(userType) {
-  currentUserType = userType;
-
-  const clienteCard = document.getElementById('cliente-card');
-  const prestadorCard = document.getElementById('prestador-card');
-  const userTypeInput = document.getElementById('user_type');
-  const submitBtn = document.getElementById('submit-btn');
-
-  // Remover classes ativas
-  clienteCard.classList.remove('active', 'inactive');
-  prestadorCard.classList.remove('active', 'inactive');
-
-  if (userType === 'customer') {
-    // Ativar cliente
-    clienteCard.classList.add('active');
-    prestadorCard.classList.add('inactive');
-
-    // Atualizar textos e valores
-    userTypeInput.value = 'customer';
-    submitBtn.textContent = 'Entrar como Cliente';
-
-  } else if (userType === 'service_provider') {
-    // Ativar prestador
-    prestadorCard.classList.add('active');
-    clienteCard.classList.add('inactive');
-
-    // Atualizar textos e valores
-    userTypeInput.value = 'service_provider';
-    submitBtn.textContent = 'Entrar como Prestador';
-  }
+function updateFormElements(isClient) {
+  document.getElementById('user_type').value = isClient ? 'cliente' : 'service_provider';
+  document.getElementById('submit-btn').textContent = isClient ? 'Entrar como Cliente' : 'Entrar como Prestador';
 }
 
 /**
- * Configura o envio do formulário
+ * 📋 Configura envio do formulário
  */
-function setupFormSubmission() {
-  const form = document.getElementById('dynamicSigninForm');
-
-  form.addEventListener('submit', function (e) {
+function setupFormHandler() {
+  document.getElementById('dynamicSigninForm').onsubmit = function (e) {
     e.preventDefault();
-    handleFormSubmission();
-  });
+    handleLogin();
+  };
 }
 
 /**
- * Processa o envio do formulário
+ * 🔐 Processa o login do usuário
  */
-function handleFormSubmission() {
+function handleLogin() {
   const form = document.getElementById('dynamicSigninForm');
+  const button = document.getElementById('submit-btn');
+  const alerts = document.getElementById('alert-area');
+
+  // Preparar dados do formulário
   const formData = new FormData(form);
-  const submitButton = document.getElementById('submit-btn');
-  const alertArea = document.getElementById('alert-area');
+  const endpoint = getLoginEndpoint();
 
-  // Determinar endpoint baseado no tipo de usuário
-  const endpoint = currentUserType === 'customer' ?
-    '../../php/cliente/cliente-signin.php' :
-    '../../php/prestador/prestador-signin.php';
+  // Mostrar estado de carregamento
+  showLoading(button);
+  clearAlerts(alerts);
 
-  // Show loading state
-  const originalText = submitButton.textContent;
-  submitButton.textContent = 'Entrando...';
-  submitButton.disabled = true;
+  // Fazer requisição de login
+  sendLoginRequest(endpoint, formData, button, alerts);
+}
 
-  // Clear previous alerts
-  alertArea.innerHTML = '';
+/**
+ * 🎯 Determina endpoint baseado no tipo de usuário
+ */
+function getLoginEndpoint() {
+  return userType === 'cliente'
+    ? '../../php/cliente/cliente-signin.php'
+    : '../../php/prestador/prestador-signin.php';
+}
 
+/**
+ * ⏳ Mostra estado de carregamento no botão
+ */
+function showLoading(button) {
+  button.originalText = button.textContent;
+  button.textContent = 'Entrando...';
+  button.disabled = true;
+}
+
+/**
+ * 🧹 Limpa alertas anteriores
+ */
+function clearAlerts(alertContainer) {
+  alertContainer.innerHTML = '';
+}
+
+/**
+ * 🌐 Envia requisição de login para o servidor
+ */
+function sendLoginRequest(endpoint, formData, button, alerts) {
   fetch(endpoint, {
     method: 'POST',
     body: formData
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Show success message
-        showAlert('success', data.message, alertArea);
-
-        // Redirect after a short delay
-        setTimeout(() => {
-          if (data.data && data.data.redirect_url) {
-            window.location.href = data.data.redirect_url;
-          } else {
-            // Fallback redirect
-            const redirectUrl = currentUserType === 'customer' ?
-              '../cliente-dashboard.html' :
-              '../prestador-dashboard.html';
-            window.location.href = redirectUrl;
-          }
-        }, 1500);
-      } else {
-        // Show error message
-        showAlert('danger', data.error, alertArea);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      showAlert('danger', 'Erro de conexão. Tente novamente.', alertArea);
-    })
-    .finally(() => {
-      // Reset button state
-      submitButton.textContent = originalText;
-      submitButton.disabled = false;
-    });
+    .then(response => processResponse(response))
+    .then(data => handleLoginResponse(data, button, alerts))
+    .catch(error => handleLoginError(error, button, alerts))
+    .finally(() => resetButton(button));
 }
 
 /**
- * Show alert message
+ * 📊 Processa resposta HTTP
+ */
+function processResponse(response) {
+  if (!response.ok) {
+    throw new Error(`Erro HTTP: ${response.status}`);
+  }
+  return response.json();
+}
+
+/**
+ * ✅ Trata resposta de login bem-sucedida
+ */
+function handleLoginResponse(data, button, alerts) {
+  if (data.success) {
+    showAlert('success', data.message, alerts);
+    redirectToUserDashboard();
+  } else {
+    showAlert('danger', data.message || 'Erro no login', alerts);
+  }
+}
+
+/**
+ * ❌ Trata erros de login
+ */
+function handleLoginError(error, button, alerts) {
+  console.error('Erro de login:', error);
+  showAlert('danger', 'Erro de conexão. Tente novamente.', alerts);
+}
+
+/**
+ * 🔄 Restaura estado original do botão
+ */
+function resetButton(button) {
+  button.textContent = button.originalText;
+  button.disabled = false;
+}
+
+/**
+ * 🏠 Redireciona para dashboard do usuário
+ */
+function redirectToUserDashboard() {
+  setTimeout(() => {
+    const dashboardUrl = userType === 'cliente'
+      ? '../cliente-dashboard.html'
+      : '../prestador-dashboard.html';
+    window.location.href = dashboardUrl;
+  }, 1500);
+}
+
+/**
+ * 🚨 Exibe alerta de sucesso ou erro
  */
 function showAlert(type, message, container) {
   const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-  const iconClass = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
+  const icon = type === 'success' ? '✅' : '❌';
 
-  const alertHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="${type}:">
-                <use xlink:href="#${iconClass}"/>
-            </svg>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-
-  container.innerHTML = alertHTML;
-
-  // Add Bootstrap icons if not already present
-  if (!document.getElementById('bootstrap-icons')) {
-    const iconsHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                </symbol>
-                <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                </symbol>
-            </svg>
-        `;
-
-    const div = document.createElement('div');
-    div.id = 'bootstrap-icons';
-    div.innerHTML = iconsHTML;
-    document.body.appendChild(div);
-  }
+  container.innerHTML = `
+    <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+      ${icon} ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
 }

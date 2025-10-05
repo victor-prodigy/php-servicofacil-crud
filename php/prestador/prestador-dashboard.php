@@ -1,22 +1,24 @@
 <?php
+// NOTE: iniciar sessão
 session_start();
 
-// Verificar se o usuário está logado e é um prestador
-if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'prestador') {
-    $response = [
+// NOTE: verificar se é prestador logado
+if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'prestador') {
+    $resposta = [
         'authenticated' => false,
-        'message' => 'Acesso não autorizado. Faça login como prestador.'
+        'msg' => 'Acesso negado. Faça login como prestador.'
     ];
-    echo json_encode($response);
-    exit;
+} else {
+    $resposta = [
+        'authenticated' => true,
+        'usuario_id' => $_SESSION['usuario_id'],
+        'nome' => $_SESSION['nome'],
+        'email' => $_SESSION['email'],
+        'specialty' => $_SESSION['specialty'],
+        'location' => $_SESSION['location'],
+        'usuario_tipo' => $_SESSION['usuario_tipo']
+    ];
 }
 
-// Se chegou aqui, o usuário está autenticado como prestador
-$response = [
-    'authenticated' => true,
-    'user_id' => $_SESSION['usuario_id'],
-    'nome' => $_SESSION['nome'] ?? 'Prestador'
-];
-
-echo json_encode($response);
-?>
+header('Content-Type: application/json');
+echo json_encode($resposta);

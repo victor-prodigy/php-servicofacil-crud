@@ -6,7 +6,7 @@ require_once __DIR__ . '/../conexao.php';
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'prestador') {
     http_response_code(401);
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Acesso negado. Faça login como prestador.'
     ]);
     exit;
@@ -30,25 +30,24 @@ try {
             FROM service_request 
             WHERE status = 'pendente'
             ORDER BY created_at DESC";
-    
+
     $result = $conn->query($sql);
-    
+
     if (!$result) {
         throw new Exception("Erro na consulta: " . $conn->error);
     }
-    
+
     $solicitacoes = [];
     while ($row = $result->fetch_assoc()) {
         $solicitacoes[] = $row;
     }
-    
+
     echo json_encode([
         'success' => true,
         'solicitacoes' => $solicitacoes,
         'total' => count($solicitacoes),
         'tipo' => 'visualizacao_prestador'
     ]);
-    
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,
@@ -57,4 +56,3 @@ try {
 }
 
 $conn->close();
-?>

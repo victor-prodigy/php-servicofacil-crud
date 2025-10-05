@@ -18,9 +18,9 @@ async function checkAuthentication() {
         document.getElementById('userName').textContent = data.nome;
         document.getElementById('dashboardContent').style.display = 'block';
 
-        // Carregar a lista de serviços (próprios) e solicitações (visualização)
-        carregarServicos();
-        carregarSolicitacoes();
+        // Carregar a lista de propostas (próprias) e serviços dos clientes (visualização)
+        carregarPropostas();
+        carregarServicosClientes();
 
     } catch (error) {
         console.error('Erro ao verificar autenticação:', error);
@@ -29,80 +29,76 @@ async function checkAuthentication() {
     }
 }
 
-async function carregarServicos() {
+async function carregarPropostas() {
     try {
-        const response = await fetch('../php/servico/servico-listar.php');
+        const response = await fetch('../php/prestador/listar-propostas.php');
         const data = await response.json();
 
         if (!data.success) {
-            throw new Error(data.message);
+            throw new Error(data.error || 'Erro ao carregar propostas');
         }
 
-        const tableBody = document.getElementById('servicosTable');
+        const tableBody = document.getElementById('propostasTable');
         tableBody.innerHTML = ''; // Limpar tabela
 
-        if (data.servicos.length === 0) {
+        if (data.propostas.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center text-muted">
+                    <td colspan="7" class="text-center text-muted">
                         <i class="bi bi-inbox"></i> 
-                        Nenhum serviço publicado ainda.
+                        Nenhuma proposta enviada ainda.
                         <br>
-                        <a href="./servico/servico-novo.html" class="btn btn-primary btn-sm mt-2">
-                            <i class="bi bi-plus-circle"></i> Publicar primeiro serviço
-                        </a>
+                        <small>Navegue pelas solicitações de clientes abaixo e envie suas propostas!</small>
                     </td>
                 </tr>
             `;
             return;
         }
 
-        data.servicos.forEach(servico => {
+        data.propostas.forEach(proposta => {
             const row = document.createElement('tr');
 
-            // Formatar data
-            const data_formatada = new Date(servico.data_postagem).toLocaleDateString('pt-BR');
-
-            // Definir classe do status
-            const statusClass = getStatusClass(servico.status);
-
-            // Formatar preço
-            const preco = servico.orcamento ? 
-                new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                }).format(servico.orcamento) : 'A combinar';
+            // Definir classe do status baseado no status da solicitação
+            const statusClass = getStatusClassSolicitacao(proposta.status_solicitacao);
 
             row.innerHTML = `
                 <td>
-                    <strong>${servico.titulo}</strong>
+                    <strong>${proposta.solicitacao_titulo}</strong>
                     <br>
-                    <small class="text-muted">${servico.localizacao}</small>
+                    <small class="text-muted">${proposta.categoria} • ${proposta.cidade}</small>
                 </td>
                 <td>
-                    <span class="badge bg-info">${servico.categoria}</span>
+                    <strong>${proposta.cliente_nome}</strong>
+                    <br>
+                    <small class="text-muted">${proposta.cliente_email}</small>
                 </td>
-                <td>${preco}</td>
-                <td><span class="badge ${statusClass}">${getStatusText(servico.status)}</span></td>
                 <td>
-                    <small>${data_formatada}</small>
+                    <strong class="text-success">R$ ${proposta.valor_proposto}</strong>
+                    <br>
+                    <small class="text-muted">Orçamento máximo: ${proposta.orcamento_maximo}</small>
+                </td>
+                <td>
+                    <span class="badge bg-info">${proposta.prazo_estimado}</span>
+                </td>
+                <td>
+                    <span class="badge ${statusClass}">
+                        ${getStatusTextSolicitacao(proposta.status_solicitacao)}
+                    </span>
+                </td>
+                <td>
+                    <small>${proposta.data_proposta}</small>
                 </td>
                 <td>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-sm btn-outline-primary" 
-                                onclick="verDetalhesServico(${servico.id})" 
-                                title="Ver detalhes">
+                                onclick="verDetalhesProposta(${proposta.proposal_id})" 
+                                title="Ver detalhes da proposta">
                             <i class="bi bi-eye"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-warning" 
-                                onclick="editarServico(${servico.id})" 
-                                title="Editar">
+                                onclick="editarProposta(${proposta.proposal_id})" 
+                                title="Editar proposta">
                             <i class="bi bi-pencil"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                onclick="excluirServico(${servico.id})" 
-                                title="Excluir">
-                            <i class="bi bi-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -112,67 +108,77 @@ async function carregarServicos() {
         });
 
     } catch (error) {
-        console.error('Erro ao carregar serviços:', error);
-        const tableBody = document.getElementById('servicosTable');
+        console.error('Erro ao carregar propostas:', error);
+        const tableBody = document.getElementById('propostasTable');
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-danger">
+                <td colspan="7" class="text-center text-danger">
                     <i class="bi bi-exclamation-triangle"></i> 
-                    Erro ao carregar serviços: ${error.message}
+                    Erro ao carregar propostas: ${error.message}
                 </td>
             </tr>
         `;
     }
 }
 
-async function carregarSolicitacoes() {
+async function carregarServicosClientes() {
     try {
-        const response = await fetch('../php/servico/listar-solicitacoes-prestador.php');
+        const response = await fetch('../php/servico/listar-servico.php');
         const data = await response.json();
 
-        const tableBody = document.getElementById('solicitacoesTable');
+        const tableBody = document.getElementById('servicosClientesTable');
         tableBody.innerHTML = ''; // Limpar tabela
 
-        if (!data.success || data.solicitacoes.length === 0) {
+        if (!data.success || data.servicos.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="text-center text-muted">
+                    <td colspan="9" class="text-center text-muted">
                         <i class="bi bi-inbox"></i> 
-                        Nenhuma solicitação de cliente encontrada.
+                        Nenhum serviço postado pelos clientes encontrado.
                     </td>
                 </tr>
             `;
             return;
         }
 
-        // Adicionar cada solicitação à tabela
-        data.solicitacoes.forEach(solicitacao => {
+        // Adicionar cada serviço à tabela
+        data.servicos.forEach(servico => {
             const row = document.createElement('tr');
 
-            const dataFormatada = new Date(solicitacao.data_criacao).toLocaleDateString('pt-BR');
-            const orcamento = solicitacao.orcamento_maximo ?
-                `R$ ${parseFloat(solicitacao.orcamento_maximo).toFixed(2)}` :
+            const dataFormatada = new Date(servico.data_postagem).toLocaleDateString('pt-BR');
+            const orcamento = servico.orcamento ?
+                `R$ ${parseFloat(servico.orcamento).toFixed(2)}` :
+                'A combinar';
+
+            // Formatar prazo
+            const prazo = servico.prazo ? 
+                new Date(servico.prazo).toLocaleDateString('pt-BR') : 
                 'Flexível';
 
             row.innerHTML = `
                 <td>
-                    <strong>${solicitacao.titulo}</strong>
+                    <strong>${servico.titulo}</strong>
                     <br>
-                    <small class="text-muted">${solicitacao.endereco}</small>
+                    <small class="text-muted">${servico.descricao.substring(0, 50)}${servico.descricao.length > 50 ? '...' : ''}</small>
                 </td>
                 <td>
-                    <span class="badge bg-success">${solicitacao.categoria}</span>
-                </td>
-                <td>${orcamento}</td>
-                <td>
-                    <small>${solicitacao.prazo_desejado}</small>
+                    <span class="badge bg-success">${servico.categoria}</span>
                 </td>
                 <td>
-                    <small>${solicitacao.cidade}</small>
+                    <strong>${servico.cliente_nome}</strong>
                 </td>
                 <td>
-                    <span class="badge ${getStatusClassSolicitacao(solicitacao.status)}">
-                        ${getStatusTextSolicitacao(solicitacao.status)}
+                    <strong class="text-success">${orcamento}</strong>
+                </td>
+                <td>
+                    <small>${prazo}</small>
+                </td>
+                <td>
+                    <small>${servico.localizacao}</small>
+                </td>
+                <td>
+                    <span class="badge ${getStatusClassServico(servico.status)}">
+                        ${getStatusTextServico(servico.status)}
                     </span>
                 </td>
                 <td>
@@ -181,14 +187,14 @@ async function carregarSolicitacoes() {
                 <td>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-sm btn-outline-primary" 
-                                onclick="verDetalhesSolicitacao(${solicitacao.id})" 
+                                onclick="verDetalhesServico(${servico.id})" 
                                 title="Ver detalhes">
                             <i class="bi bi-eye"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-success" 
-                                onclick="oferecerOrcamento(${solicitacao.id})" 
-                                title="Ofertar serviço">
-                            <i class="bi bi-hand-thumbs-up"></i>
+                                onclick="enviarProposta(${servico.id})" 
+                                title="Enviar Proposta">
+                            <i class="bi bi-send"></i>
                         </button>
                     </div>
                 </td>
@@ -198,13 +204,13 @@ async function carregarSolicitacoes() {
         });
 
     } catch (error) {
-        console.error('Erro ao carregar solicitações:', error);
-        const tableBody = document.getElementById('solicitacoesTable');
+        console.error('Erro ao carregar serviços dos clientes:', error);
+        const tableBody = document.getElementById('servicosClientesTable');
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center text-danger">
+                <td colspan="9" class="text-center text-danger">
                     <i class="bi bi-exclamation-triangle"></i> 
-                    Erro ao carregar solicitações: ${error.message}
+                    Erro ao carregar serviços: ${error.message}
                 </td>
             </tr>
         `;
@@ -226,6 +232,29 @@ function getStatusText(status) {
         'ativo': 'Ativo',
         'inativo': 'Inativo',
         'pausado': 'Pausado'
+    };
+    return statusTexts[status] || 'Desconhecido';
+}
+
+// Funções auxiliares para status dos serviços postados pelos clientes
+function getStatusClassServico(status) {
+    const statusClasses = {
+        'aberto': 'bg-success',
+        'fechado': 'bg-secondary',
+        'em_andamento': 'bg-primary',
+        'concluido': 'bg-info',
+        'cancelado': 'bg-danger'
+    };
+    return statusClasses[status] || 'bg-secondary';
+}
+
+function getStatusTextServico(status) {
+    const statusTexts = {
+        'aberto': 'Aberto',
+        'fechado': 'Fechado',
+        'em_andamento': 'Em Andamento',
+        'concluido': 'Concluído',
+        'cancelado': 'Cancelado'
     };
     return statusTexts[status] || 'Desconhecido';
 }
@@ -269,7 +298,7 @@ async function excluirServico(id) {
         const formData = new FormData();
         formData.append('servico_id', id);
 
-        const response = await fetch('../php/servico/servico-excluir.php', {
+        const response = await fetch('../php/servico/apaga-servico.php', {
             method: 'POST',
             body: formData
         });
@@ -289,13 +318,143 @@ async function excluirServico(id) {
     }
 }
 
-// Funções para ações das solicitações
-function verDetalhesSolicitacao(id) {
-    alert(`Ver detalhes da solicitação ${id} - Funcionalidade em desenvolvimento`);
+function enviarProposta(servicoId) {
+    // Criar modal para enviar proposta para service_request
+    const modalHtml = `
+        <div class="modal fade" id="propostaModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-send-fill"></i> Enviar Proposta para Solicitação
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="propostaForm">
+                            <input type="hidden" id="requestId" value="${servicoId}">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="valorProposta" class="form-label">Valor da Proposta (R$) *</label>
+                                        <input type="number" class="form-control" id="valorProposta" 
+                                               step="0.01" min="0.01" required 
+                                               placeholder="Ex: 150.00">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="prazoEstimado" class="form-label">Prazo Estimado *</label>
+                                        <input type="text" class="form-control" id="prazoEstimado" 
+                                               placeholder="Ex: 3 dias, 1 semana, 15 dias úteis" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="mensagemProposta" class="form-label">Descrição do Trabalho *</label>
+                                <textarea class="form-control" id="mensagemProposta" rows="4" required
+                                          placeholder="Descreva detalhadamente como você realizará o serviço, materiais que utilizará, metodologia, etc..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" onclick="processarEnvioProposta()">
+                            <i class="bi bi-send"></i> Enviar Proposta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal anterior se existir
+    const existingModal = document.getElementById('propostaModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Adicionar modal ao body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('propostaModal'));
+    modal.show();
 }
 
-function oferecerOrcamento(id) {
-    alert(`Ofertar orçamento para solicitação ${id} - Funcionalidade em desenvolvimento`);
+// Funções para gerenciar propostas
+async function processarEnvioProposta() {
+    try {
+        const requestId = document.getElementById('requestId').value;
+        const valorProposta = document.getElementById('valorProposta').value;
+        const prazoEstimado = document.getElementById('prazoEstimado').value;
+        const mensagemProposta = document.getElementById('mensagemProposta').value;
+        
+        // Validações
+        if (!valorProposta || parseFloat(valorProposta) <= 0) {
+            alert('Por favor, informe um valor válido para a proposta');
+            return;
+        }
+        
+        if (!prazoEstimado.trim()) {
+            alert('Por favor, informe o prazo estimado');
+            return;
+        }
+        
+        if (!mensagemProposta.trim()) {
+            alert('Por favor, descreva como você realizará o trabalho');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('request_id', requestId);
+        formData.append('amount', valorProposta);
+        formData.append('estimate', prazoEstimado);
+        formData.append('message', mensagemProposta);
+        
+        const response = await fetch('../php/prestador/criar-proposta.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('propostaModal'));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            alert(`✅ Proposta enviada com sucesso para "${data.solicitacao_titulo}"!\n\nO cliente receberá sua proposta e poderá entrar em contato.`);
+            
+            // Recarregar a lista de propostas
+            carregarPropostas();
+            
+        } else {
+            alert('❌ Erro ao enviar proposta: ' + data.error);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao enviar proposta:', error);
+        alert('❌ Erro ao enviar proposta. Verifique sua conexão e tente novamente.');
+    }
+}
+
+function verDetalhesServico(servicoId) {
+    // Implementar modal para mostrar detalhes completos da solicitação
+    alert(`Ver detalhes da solicitação ${servicoId} - Em desenvolvimento`);
+}
+
+function verDetalhesProposta(proposalId) {
+    // Implementar modal ou página para ver detalhes da proposta
+    alert(`Ver detalhes da proposta ${proposalId} - Funcionalidade em desenvolvimento`);
+}
+
+function editarProposta(proposalId) {
+    // Implementar funcionalidade para editar proposta
+    alert(`Editar proposta ${proposalId} - Funcionalidade em desenvolvimento`);
 }
 
 function logout() {

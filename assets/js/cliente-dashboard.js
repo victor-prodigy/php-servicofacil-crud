@@ -31,7 +31,7 @@ async function checkAuthentication() {
 
 async function carregarServicos() {
     try {
-        const response = await fetch('../php/servico/servico-listar.php');
+        const response = await fetch('../php/servico/listar-servico.php');
         const data = await response.json();
 
         if (!data.success) {
@@ -63,7 +63,7 @@ async function carregarServicos() {
             const statusClass = getStatusClass(servico.status);
 
             // Formatar orçamento
-            const orcamento = servico.orcamento ? 
+            const orcamento = servico.orcamento ?
                 new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
@@ -135,7 +135,7 @@ async function excluirServico(id) {
         const formData = new FormData();
         formData.append('servico_id', id);
 
-        const response = await fetch('../php/servico/servico-excluir.php', {
+        const response = await fetch('../php/servico/apaga-servico.php', {
             method: 'POST',
             body: formData
         });
@@ -188,7 +188,7 @@ async function carregarSolicitacoes() {
                         <i class="bi bi-inbox"></i> 
                         Nenhuma solicitação de serviço encontrada.
                         <br>
-                        <a href="./servico/solicitar-servico.html" class="btn btn-success btn-sm mt-2">
+                        <a href="./servico/nova-solicitacao.html" class="btn btn-success btn-sm mt-2">
                             <i class="bi bi-plus-circle"></i> Fazer primeira solicitação
                         </a>
                     </td>
@@ -293,8 +293,8 @@ function verDetalhes(id) {
 }
 
 function editarSolicitacao(id) {
-    // Redirecionar para página de edição (a ser implementada)
-    alert(`Editar solicitação ${id} - Funcionalidade em desenvolvimento`);
+    // Redirecionar para página de edição
+    window.location.href = `./servico/altera-solicitacao.html?id=${id}`;
 }
 
 async function excluirSolicitacao(id) {
@@ -306,7 +306,7 @@ async function excluirSolicitacao(id) {
         const formData = new FormData();
         formData.append('solicitacao_id', id);
 
-        const response = await fetch('../php/servico/excluir-solicitacao.php', {
+        const response = await fetch('../php/servico/apaga-solicitacao.php', {
             method: 'POST',
             body: formData
         });

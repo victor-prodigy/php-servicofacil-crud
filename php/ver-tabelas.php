@@ -1,5 +1,5 @@
 <?php
-require_once 'php/conexao.php';
+require_once 'conexao.php';
 
 echo "=== LISTANDO TABELAS ===\n";
 $result = $conn->query('SHOW TABLES');

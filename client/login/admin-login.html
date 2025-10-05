@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ServiçoFácil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../../assets/css/auth.css" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #dc3545, #6f42c1);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .admin-form {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #dc3545;
+        }
+        
+        .admin-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        
+        .btn-admin {
+            background: linear-gradient(135deg, #dc3545, #6f42c1);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .security-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Header Administrativo -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="admin-icon">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h1><i class="bi bi-gear"></i> Área Administrativa</h1>
+            <p class="mb-0">ServiçoFácil - Painel de Controle</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center" style="margin-top: -50px;">
+            <div class="col-md-5">
+                <div class="card admin-form border-0">
+                    <div class="card-header bg-transparent border-0 text-center py-4">
+                        <h3 class="text-dark mb-0">
+                            <i class="bi bi-person-badge text-danger"></i>
+                            Login Administrativo
+                        </h3>
+                        <p class="text-muted mt-2">Acesso restrito ao administrador</p>
+                    </div>
+                    
+                    <div class="card-body px-4 pb-4">
+                        <!-- Aviso de Segurança -->
+                        <div class="security-notice">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <small class="text-dark">
+                                    <strong>Área Restrita:</strong> Este é um ambiente administrativo protegido. 
+                                    Apenas administradores autorizados podem acessar.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Formulário de Login -->
+                        <form id="adminLoginForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email Administrativo
+                                </label>
+                                <input 
+                                    type="email" 
+                                    class="form-control form-control-lg" 
+                                    id="email" 
+                                    name="email"
+                                    placeholder="admin@servicofacil.com"
+                                    required
+                                    autocomplete="username"
+                                >
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="senha" class="form-label">
+                                    <i class="bi bi-key"></i> Senha
+                                </label>
+                                <div class="input-group">
+                                    <input 
+                                        type="password" 
+                                        class="form-control form-control-lg" 
+                                        id="senha" 
+                                        name="senha"
+                                        placeholder="Digite sua senha"
+                                        required
+                                        autocomplete="current-password"
+                                    >
+                                    <button 
+                                        class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        onclick="togglePassword()"
+                                        title="Mostrar/Ocultar senha"
+                                    >
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div id="loadingState" style="display: none;" class="text-center mb-3">
+                                <div class="spinner-border text-danger" role="status">
+                                    <span class="visually-hidden">Verificando credenciais...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Verificando credenciais...</p>
+                            </div>
+
+                            <!-- Error Alert -->
+                            <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <span id="errorMessage"></span>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                class="btn btn-admin btn-lg w-100 text-white"
+                                id="loginButton"
+                            >
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Acessar Painel Administrativo
+                            </button>
+                        </form>
+
+                        <!-- Informações Adicionais -->
+                        <div class="text-center mt-4">
+                            <hr>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                Problemas de acesso? Entre em contato com o suporte técnico.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link para voltar -->
+                <div class="text-center mt-3">
+                    <a href="../../index.html" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Voltar ao Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se já está logado
+            checkIfAlreadyLoggedIn();
+            
+            // Configurar formulário
+            document.getElementById('adminLoginForm').addEventListener('submit', handleLogin);
+        });
+
+        // Verificar se já está logado
+        async function checkIfAlreadyLoggedIn() {
+            try {
+                const response = await fetch('../../../php/admin/admin-dashboard.php');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    // Se já estiver logado, redireciona
+                    window.location.href = '../administrador-dashboard.html';
+                }
+            } catch (error) {
+                console.log('Não está logado como admin');
+            }
+        }
+
+        // Manipular login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            
+            // Mostrar loading
+            showLoading(true);
+            hideError();
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('senha', senha);
+                
+                const response = await fetch('../../../php/admin/admin-login.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Login bem-sucedido
+                    window.location.href = '../administrador-dashboard.html';
+                } else {
+                    // Erro no login
+                    showError(data.error || 'Credenciais inválidas');
+                }
+                
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showError('Erro de conexão. Tente novamente.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+            document.getElementById('loginButton').disabled = show;
+        }
+
+        // Mostrar erro
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorAlert').classList.remove('d-none');
+        }
+
+        // Ocultar erro
+        function hideError() {
+            document.getElementById('errorAlert').classList.add('d-none');
+        }
+
+        // Toggle senha
+        function togglePassword() {
+            const senhaInput = document.getElementById('senha');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                toggleIcon.className = 'bi bi-eye-slash';
+            } else {
+                senhaInput.type = 'password';
+                toggleIcon.className = 'bi bi-eye';
+            }
+        }
+
+        // Limpar formulário se houver erro
+        document.getElementById('senha').addEventListener('input', hideError);
+        document.getElementById('email').addEventListener('input', hideError);
+    </script>
+</body>
+</html>
