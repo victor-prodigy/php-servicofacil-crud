@@ -11,6 +11,7 @@ $dbname = "servicofacil";
 
 try {
     // Criar conexão PDO
+    // PDO (PHP Data Objects) é uma extensão do PHP que fornece uma interface consistente para acessar diferentes tipos de banco de dados. É uma camada de abstração que permite trabalhar com vários SGBDs usando a mesma sintaxe.
     $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
     $pdo = new PDO($dsn, $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
