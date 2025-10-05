@@ -8,11 +8,13 @@ async function checkAuthentication() {
         const data = await response.json();
 
         if (!data.authenticated) {
+            // Se não estiver autenticado, redireciona para a página de login
             alert(data.message);
             window.location.href = './login/index.html';
             return;
         }
 
+        // Se estiver autenticado, mostra o conteúdo e atualiza o nome do usuário
         document.getElementById('userName').textContent = data.nome;
         document.getElementById('dashboardContent').style.display = 'block';
 
@@ -215,6 +217,7 @@ async function carregarServicosClientes() {
     }
 }
 
+// Funções auxiliares para status dos serviços
 function getStatusClass(status) {
     const statusClasses = {
         'ativo': 'bg-success',
@@ -277,6 +280,7 @@ function getStatusTextSolicitacao(status) {
     return statusTexts[status] || 'Desconhecido';
 }
 
+// Funções para ações dos serviços
 function verDetalhesServico(id) {
     alert(`Ver detalhes do serviço ${id} - Funcionalidade em desenvolvimento`);
 }
@@ -303,7 +307,7 @@ async function excluirServico(id) {
 
         if (data.success) {
             alert('Serviço excluído com sucesso!');
-            carregarServicos();
+            carregarServicos(); // Recarregar a tabela
         } else {
             throw new Error(data.message);
         }
@@ -454,14 +458,18 @@ function editarProposta(proposalId) {
 }
 
 function logout() {
+    // Limpar dados da sessão no localStorage
     localStorage.clear();
 
+    // Fazer requisição para destruir a sessão no servidor
     fetch('../php/logout.php')
         .then(() => {
+            // Redirecionar para a página de login
             window.location.href = './login/index.html';
         })
         .catch(error => {
             console.error('Erro ao fazer logout:', error);
+            // Mesmo com erro, redireciona para garantir que o usuário saia
             window.location.href = './login/index.html';
         });
 }
