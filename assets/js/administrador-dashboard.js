@@ -1,396 +1,482 @@
-// Dashboard Administrativo - JavaScript
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Dashboard administrativo carregado');
-    checkAuthentication();
-});
+  // Elementos DOM
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  const navLinks = document.querySelectorAll('.nav-link[data-section]');
+  const contentSections = document.querySelectorAll('.content-section');
+  const pageTitle = document.getElementById('pageTitle');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const currentDate = document.getElementById('currentDate');
 
-// Verificar autenticação administrativa
-async function checkAuthentication() {
-    try {
-        const response = await fetch('../php/admin/admin-dashboard.php');
-        const data = await response.json();
+  // Verificar autenticação
+  checkAuth();
 
-        if (!data.authenticated) {
-            // Se não estiver autenticado, redireciona para login
-            alert(data.message);
-            window.location.href = './login/admin-login.html';
-            return;
+  // Inicializar
+  init();
+
+  function init() {
+    updateCurrentDate();
+    loadDashboardData();
+    setupEventListeners();
+    showSection('services'); // Mostrar seção de serviços por padrão
+  }
+
+  function setupEventListeners() {
+    // Toggle sidebar
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+      });
+    }
+
+    // Navigation
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        showSection(section);
+
+        // Update active nav
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        // Close sidebar on mobile
+        if (window.innerWidth < 992) {
+          sidebar.classList.remove('show');
         }
+      });
+    });
 
-        // Se estiver autenticado, mostra o conteúdo e atualiza informações
-        document.getElementById('adminName').textContent = data.usuario.nome;
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
+    // Logout
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
 
-        // Carregar dados do dashboard
-        carregarDashboard();
+    // Refresh
+    refreshBtn.addEventListener('click', () => {
+      loadDashboardData();
+      loadServicesData();
+    });
+
+    // Search and filter for services
+    const searchServices = document.getElementById('searchServices');
+    const statusFilter = document.getElementById('statusFilter');
+
+    if (searchServices) {
+      searchServices.addEventListener('input', debounce(() => {
+        loadServicesData();
+      }, 300));
+    }
+
+    if (statusFilter) {
+      statusFilter.addEventListener('change', () => {
+        loadServicesData();
+      });
+    }
+  }
+
+  async function checkAuth() {
+    try {
+      // Mostrar loading enquanto verifica autenticação
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'loadingAuth';
+      loadingDiv.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center';
+      loadingDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+      loadingDiv.style.zIndex = '9999';
+      loadingDiv.innerHTML = `
+        <div class="text-center">
+          <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Verificando acesso...</span>
+          </div>
+          <h5>Verificando permissões de administrador...</h5>
+        </div>
+      `;
+      document.body.appendChild(loadingDiv);
+
+      const response = await fetch('../php/admin/verificar-auth.php');
+      const data = await response.json();
+
+        // Remover loading
+      document.getElementById('loadingAuth')?.remove();
+
+      if (!data.authenticated) {
+        // Mostrar alerta antes de redirecionar
+        alert(data.usuario.message || 'Acesso negado. Você não tem permissões de administrador.');
+        window.location.href = 'login/administrador-signin.html';
+        return;
+      }
+
+      // Update user info
+      document.getElementById('userName').textContent = data.usuario.nome;
+      document.getElementById('userEmail').textContent = data.usuario.email;
+
+      // Log de sucesso
+      console.log('✅ Acesso autorizado para administrador:', data.usuario.nome);
 
     } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
-        alert('Erro ao carregar a página. Por favor, tente novamente.');
-        window.location.href = './login/admin-login.html';
+      console.error('❌ Erro na verificação de autenticação:', error);
+
+      // Remover loading se houver erro
+      document.getElementById('loadingAuth')?.remove();
+
+      alert('Erro ao verificar autenticação. Redirecionando para login...');
+      window.location.href = 'login/administrador-signin.html';
     }
-}
+  }
 
-// Carregar dados do dashboard
-async function carregarDashboard() {
-    await carregarUsuarios();
-    carregarAtividadesRecentes();
-    carregarEstatisticasSistema();
-}
-
-// Carregar lista de usuários
-async function carregarUsuarios() {
+  async function loadDashboardData() {
     try {
-        const response = await fetch('../php/admin/listar-usuarios.php');
-        const data = await response.json();
+      const response = await fetch('../php/admin/administrador-dashboard.php?action=stats');
+      const data = await response.json();
 
-        if (!data.success) {
-            throw new Error(data.error || 'Erro ao carregar usuários');
-        }
-
-        // Atualizar estatísticas
-        document.getElementById('totalUsuarios').textContent = data.estatisticas.total_usuarios;
-        document.getElementById('totalClientes').textContent = data.estatisticas.total_clientes;
-        document.getElementById('totalPrestadores').textContent = data.estatisticas.total_prestadores;
-        document.getElementById('usuariosAtivos').textContent = data.estatisticas.usuarios_ativos;
-
-        // Armazenar dados globalmente para filtros
-        window.todosUsuarios = data.usuarios;
-        
-        // Renderizar tabela
-        renderizarTabelaUsuarios(data.usuarios);
-
+      if (data.success) {
+        const stats = data.data;
+        document.getElementById('totalUsers').textContent = stats.total_users || 0;
+        document.getElementById('totalServices').textContent = stats.total_services || 0;
+        document.getElementById('totalProposals').textContent = stats.total_proposals || 0;
+        document.getElementById('totalContracts').textContent = stats.total_contracts || 0;
+      }
     } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-        mostrarErroTabela('Erro ao carregar usuários: ' + error.message);
+      console.error('Erro ao carregar estatísticas:', error);
     }
-}
+  }
 
-// Renderizar tabela de usuários
-function renderizarTabelaUsuarios(usuarios) {
-    const tableBody = document.getElementById('usuariosTable');
-    tableBody.innerHTML = '';
+  async function loadServicesData() {
+    try {
+      const search = document.getElementById('searchServices')?.value || '';
+      const status = document.getElementById('statusFilter')?.value || '';
 
-    if (usuarios.length === 0) {
-        tableBody.innerHTML = `
+      const params = new URLSearchParams({
+        action: 'services',
+        search: search,
+        status: status
+      });
+
+      const response = await fetch(`../php/admin/administrador-dashboard.php?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        renderServicesTable(data.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
+    }
+  }
+
+  function renderServicesTable(services) {
+    const tbody = document.querySelector('#servicesTable tbody');
+    if (!tbody) {
+      // Create tbody if it doesn't exist
+      const table = document.getElementById('servicesTable');
+      const newTbody = document.createElement('tbody');
+      table.appendChild(newTbody);
+      return renderServicesTable(services);
+    }
+
+    if (services.length === 0) {
+      tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">Nenhum serviço encontrado</p>
+                    </td>
+                </tr>
+            `;
+      return;
+    }
+
+    tbody.innerHTML = services.map(service => `
             <tr>
-                <td colspan="6" class="text-center text-muted">
-                    <i class="bi bi-inbox"></i> 
-                    Nenhum usuário encontrado.
+                <td>#${service.request_id}</td>
+                <td>
+                    <div>
+                        <strong>${service.cliente_nome}</strong>
+                        <br>
+                        <small class="text-muted">${service.cliente_email}</small>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <strong>${service.titulo}</strong>
+                        <br>
+                        <small class="text-muted">${truncateText(service.descricao, 50)}</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-secondary">${service.categoria}</span>
+                </td>
+                <td>
+                    <small>${service.cidade}</small>
+                </td>
+                <td>
+                    <span class="badge ${getStatusClass(service.status)}">${service.status}</span>
+                </td>
+                <td>
+                    <small>${formatDate(service.created_at)}</small>
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" onclick="viewServiceDetails(${service.request_id})" title="Ver detalhes">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="editService(${service.request_id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="deleteService(${service.request_id})" title="Remover">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
-        `;
-        return;
-    }
+        `).join('');
+  }
 
-    usuarios.forEach(usuario => {
-        const row = document.createElement('tr');
-        
-        // Definir classes CSS baseadas no tipo e status
-        const tipoClass = usuario.tipo_usuario === 'cliente' ? 'bg-success' : 'bg-info';
-        const statusClass = usuario.status === 'ativo' ? 'bg-success' : 'bg-warning text-dark';
-        
-        // Avatar com iniciais
-        const iniciais = usuario.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        
-        row.innerHTML = `
-            <td>
-                <div class="d-flex align-items-center">
-                    <div class="user-avatar me-3">
-                        ${iniciais}
-                    </div>
-                    <div>
-                        <strong>${usuario.nome}</strong>
-                        <br>
-                        <small class="text-muted">${usuario.email}</small>
-                        ${usuario.telefone !== 'Não informado' ? `<br><small class="text-muted"><i class="bi bi-telephone"></i> ${usuario.telefone}</small>` : ''}
-                    </div>
-                </div>
-            </td>
-            <td>
-                <span class="badge ${tipoClass}">
-                    <i class="bi bi-${usuario.tipo_usuario === 'cliente' ? 'person' : 'tools'}"></i>
-                    ${usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1)}
-                </span>
-                ${usuario.especialidade ? `<br><small class="text-muted">${usuario.especialidade}</small>` : ''}
-            </td>
-            <td>
-                <span class="badge ${statusClass}">
-                    ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                </span>
-                ${usuario.verificado ? '<br><i class="bi bi-shield-check text-success" title="Verificado"></i>' : '<br><i class="bi bi-shield-x text-warning" title="Não verificado"></i>'}
-            </td>
-            <td>
-                <small>${usuario.data_cadastro}</small>
-            </td>
-            <td>
-                <small>${usuario.ultima_atualizacao}</small>
-                ${usuario.tipo_usuario === 'cliente' ? 
-                    `<br><small class="text-muted">${usuario.total_solicitacoes} solicitações</small>` : 
-                    `<br><small class="text-muted">${usuario.total_propostas} propostas</small>`
-                }
-            </td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                            onclick="verDetalhesUsuario(${usuario.user_id})" 
-                            title="Ver detalhes">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                    ${usuario.status === 'ativo' ? 
-                        `<button type="button" class="btn btn-sm btn-outline-warning" 
-                                onclick="gerenciarUsuario(${usuario.user_id}, 'desativar')" 
-                                title="Desativar">
-                            <i class="bi bi-pause-circle"></i>
-                        </button>` :
-                        `<button type="button" class="btn btn-sm btn-outline-success" 
-                                onclick="gerenciarUsuario(${usuario.user_id}, 'ativar')" 
-                                title="Ativar">
-                            <i class="bi bi-play-circle"></i>
-                        </button>`
-                    }
-                    <button type="button" class="btn btn-sm btn-outline-danger" 
-                            onclick="confirmarExclusao(${usuario.user_id}, '${usuario.nome}')" 
-                            title="Excluir">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-
-        tableBody.appendChild(row);
-    });
-}
-
-// Filtrar usuários
-function filtrarUsuarios() {
-    if (!window.todosUsuarios) return;
-    
-    const filtroTipo = document.getElementById('filtroTipo').value;
-    const filtroStatus = document.getElementById('filtroStatus').value;
-    const busca = document.getElementById('buscarUsuario').value.toLowerCase();
-    
-    let usuariosFiltrados = window.todosUsuarios.filter(usuario => {
-        // Filtro por tipo
-        if (filtroTipo && usuario.tipo_usuario !== filtroTipo) return false;
-        
-        // Filtro por status
-        if (filtroStatus && usuario.status !== filtroStatus) return false;
-        
-        // Filtro por busca
-        if (busca && 
-            !usuario.nome.toLowerCase().includes(busca) && 
-            !usuario.email.toLowerCase().includes(busca)) return false;
-        
-        return true;
-    });
-    
-    renderizarTabelaUsuarios(usuariosFiltrados);
-}
-
-// Ver detalhes do usuário
-async function verDetalhesUsuario(userId) {
+  // Global functions for service management
+  window.viewServiceDetails = async function (serviceId) {
     try {
-        const response = await fetch(`../php/admin/detalhes-usuario.php?user_id=${userId}`);
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(data.error);
-        }
-        
-        const usuario = data.usuario;
-        const stats = data.estatisticas;
-        
-        let conteudoModal = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Informações Pessoais</h6>
-                    <p><strong>Nome:</strong> ${usuario.nome}</p>
-                    <p><strong>Email:</strong> ${usuario.email}</p>
-                    <p><strong>Telefone:</strong> ${usuario.telefone}</p>
-                    <p><strong>Tipo:</strong> 
-                        <span class="badge ${usuario.tipo_usuario === 'cliente' ? 'bg-success' : 'bg-info'}">
-                            ${usuario.tipo_usuario.charAt(0).toUpperCase() + usuario.tipo_usuario.slice(1)}
-                        </span>
-                    </p>
-                    <p><strong>Status:</strong> 
-                        <span class="badge ${usuario.status === 'ativo' ? 'bg-success' : 'bg-warning text-dark'}">
-                            ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                        </span>
-                    </p>
-                    <p><strong>Verificado:</strong> ${usuario.verificado ? '✅ Sim' : '❌ Não'}</p>
-                    <p><strong>Cadastro:</strong> ${usuario.data_cadastro}</p>
-                    <p><strong>Última atualização:</strong> ${usuario.ultima_atualizacao}</p>
-                    ${usuario.especialidade ? `<p><strong>Especialidade:</strong> ${usuario.especialidade}</p>` : ''}
-                    ${usuario.localizacao ? `<p><strong>Localização:</strong> ${usuario.localizacao}</p>` : ''}
-                </div>
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Estatísticas de Atividade</h6>
-        `;
-        
-        if (usuario.tipo_usuario === 'cliente') {
-            conteudoModal += `
-                <p><strong>Total de solicitações:</strong> ${stats.total_solicitacoes || 0}</p>
-                <p><strong>Pendentes:</strong> ${stats.solicitacoes_pendentes || 0}</p>
-                <p><strong>Concluídas:</strong> ${stats.solicitacoes_concluidas || 0}</p>
-                <p><strong>Propostas recebidas:</strong> ${stats.propostas_recebidas || 0}</p>
-            `;
-            
-            if (stats.ultimas_solicitacoes && stats.ultimas_solicitacoes.length > 0) {
-                conteudoModal += `
-                    <h6 class="mt-3">Últimas Solicitações</h6>
-                    <div class="list-group">
-                `;
-                stats.ultimas_solicitacoes.forEach(sol => {
-                    conteudoModal += `
-                        <div class="list-group-item">
-                            <strong>${sol.titulo}</strong> - ${sol.categoria}
-                            <br><small class="text-muted">${new Date(sol.created_at).toLocaleDateString('pt-BR')}</small>
-                        </div>
-                    `;
-                });
-                conteudoModal += `</div>`;
-            }
-            
-        } else if (usuario.tipo_usuario === 'prestador') {
-            conteudoModal += `
-                <p><strong>Total de propostas:</strong> ${stats.total_propostas || 0}</p>
-                <p><strong>Pendentes:</strong> ${stats.propostas_pendentes || 0}</p>
-                <p><strong>Aceitas:</strong> ${stats.propostas_aceitas || 0}</p>
-                <p><strong>Valor médio:</strong> R$ ${stats.valor_medio_propostas ? parseFloat(stats.valor_medio_propostas).toFixed(2) : '0,00'}</p>
-            `;
-            
-            if (stats.ultimas_propostas && stats.ultimas_propostas.length > 0) {
-                conteudoModal += `
-                    <h6 class="mt-3">Últimas Propostas</h6>
-                    <div class="list-group">
-                `;
-                stats.ultimas_propostas.forEach(prop => {
-                    conteudoModal += `
-                        <div class="list-group-item">
-                            <strong>${prop.titulo}</strong> - R$ ${parseFloat(prop.amount).toFixed(2)}
-                            <br><small class="text-muted">${new Date(prop.submitted_at).toLocaleDateString('pt-BR')}</small>
-                        </div>
-                    `;
-                });
-                conteudoModal += `</div>`;
-            }
-        }
-        
-        conteudoModal += `
-                </div>
+      const response = await fetch(`../php/admin/administrador-gerenciar.php?action=details&id=${serviceId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        const service = data.data;
+        const content = `
+          <div class="row">
+            <div class="col-md-6">
+              <h6><i class="fas fa-user me-2"></i>Informações do Cliente</h6>
+              <p><strong>Nome:</strong> ${service.cliente_nome}</p>
+              <p><strong>Email:</strong> ${service.cliente_email}</p>
+              <p><strong>Telefone:</strong> ${service.cliente_telefone || 'Não informado'}</p>
             </div>
+            <div class="col-md-6">
+              <h6><i class="fas fa-briefcase me-2"></i>Informações do Serviço</h6>
+              <p><strong>Status:</strong> <span class="badge ${getStatusClass(service.status)}">${service.status}</span></p>
+              <p><strong>Categoria:</strong> ${service.categoria}</p>
+              <p><strong>Data de Criação:</strong> ${formatDate(service.created_at)}</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-12">
+              <h6><i class="fas fa-info-circle me-2"></i>Detalhes do Serviço</h6>
+              <p><strong>Título:</strong> ${service.titulo}</p>
+              <p><strong>Descrição:</strong></p>
+              <p class="bg-light p-3 rounded">${service.descricao}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <h6><i class="fas fa-map-marker-alt me-2"></i>Localização</h6>
+              <p><strong>Endereço:</strong> ${service.endereco}</p>
+              <p><strong>Cidade:</strong> ${service.cidade}</p>
+            </div>
+            <div class="col-md-6">
+              <h6><i class="fas fa-dollar-sign me-2"></i>Orçamento e Prazo</h6>
+              <p><strong>Orçamento Máximo:</strong> R$ ${parseFloat(service.orcamento_maximo || 0).toFixed(2)}</p>
+              <p><strong>Prazo Desejado:</strong> ${service.prazo_desejado ? formatDate(service.prazo_desejado) : 'Não definido'}</p>
+            </div>
+          </div>
+          ${service.observacoes ? `
+          <div class="row">
+            <div class="col-12">
+              <h6><i class="fas fa-sticky-note me-2"></i>Observações</h6>
+              <p class="bg-light p-3 rounded">${service.observacoes}</p>
+            </div>
+          </div>
+          ` : ''}
         `;
-        
-        document.getElementById('detalhesUsuarioContent').innerHTML = conteudoModal;
-        
-        const modal = new bootstrap.Modal(document.getElementById('detalhesUsuarioModal'));
-        modal.show();
-        
-    } catch (error) {
-        console.error('Erro ao carregar detalhes:', error);
-        alert('Erro ao carregar detalhes do usuário: ' + error.message);
-    }
-}
 
-// Gerenciar usuário (ativar/desativar)
-async function gerenciarUsuario(userId, acao) {
-    if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) {
-        return;
+        document.getElementById('serviceDetailsContent').innerHTML = content;
+        document.getElementById('editServiceBtn').onclick = () => editService(serviceId);
+        new bootstrap.Modal(document.getElementById('serviceDetailsModal')).show();
+      } else {
+        alert('Erro ao carregar detalhes do serviço: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro de conexão ao carregar detalhes do serviço');
     }
-    
+  };
+
+  window.editService = async function (serviceId) {
     try {
-        const formData = new FormData();
-        formData.append('user_id', userId);
-        formData.append('acao', acao);
-        
-        const response = await fetch('../php/admin/gerenciar-usuario.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            alert(`✅ ${data.message}`);
-            carregarUsuarios(); // Recarregar lista
-        } else {
-            alert(`❌ ${data.error}`);
-        }
-        
+      const response = await fetch(`../php/admin/administrador-gerenciar.php?action=details&id=${serviceId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        const service = data.data;
+
+        // Preencher formulário
+        document.getElementById('editServiceId').value = service.request_id;
+        document.getElementById('editTitulo').value = service.titulo;
+        document.getElementById('editCategoria').value = service.categoria;
+        document.getElementById('editDescricao').value = service.descricao;
+        document.getElementById('editEndereco').value = service.endereco;
+        document.getElementById('editCidade').value = service.cidade;
+        document.getElementById('editOrcamento').value = service.orcamento_maximo || '';
+        document.getElementById('editPrazo').value = service.prazo_desejado || '';
+        document.getElementById('editStatus').value = service.status;
+        document.getElementById('editObservacoes').value = service.observacoes || '';
+
+        new bootstrap.Modal(document.getElementById('editServiceModal')).show();
+      } else {
+        alert('Erro ao carregar dados do serviço: ' + data.message);
+      }
     } catch (error) {
-        console.error('Erro ao gerenciar usuário:', error);
-        alert('❌ Erro ao processar ação. Tente novamente.');
+      console.error('Erro:', error);
+      alert('Erro de conexão ao carregar dados do serviço');
     }
-}
+  };
 
-// Confirmar exclusão
-function confirmarExclusao(userId, nomeUsuario) {
-    if (confirm(`⚠️ ATENÇÃO: Tem certeza que deseja EXCLUIR PERMANENTEMENTE o usuário "${nomeUsuario}"?\n\nEsta ação não pode ser desfeita!`)) {
-        gerenciarUsuario(userId, 'excluir');
+  window.deleteService = async function (serviceId) {
+    if (!confirm('Tem certeza que deseja remover este serviço? Esta ação não pode ser desfeita.')) {
+      return;
     }
-}
 
-// Carregar atividades recentes (placeholder)
-function carregarAtividadesRecentes() {
-    const container = document.getElementById('atividadesRecentes');
-    container.innerHTML = `
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-person-plus text-success me-2"></i>
-            <small>Novo cliente cadastrado - João Silva - 2 horas atrás</small>
-        </div>
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-send text-info me-2"></i>
-            <small>Nova proposta enviada - Maria Santos - 4 horas atrás</small>
-        </div>
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-check-circle text-success me-2"></i>
-            <small>Solicitação concluída - Pedro Lima - 6 horas atrás</small>
-        </div>
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-person-plus text-success me-2"></i>
-            <small>Novo prestador cadastrado - Ana Costa - 8 horas atrás</small>
-        </div>
-    `;
-}
+    try {
+      const response = await fetch(`../php/admin/administrador-gerenciar.php?id=${serviceId}`, {
+        method: 'DELETE'
+      });
 
-// Carregar estatísticas do sistema (placeholder)
-function carregarEstatisticasSistema() {
-    // Simular dados de progresso
-    document.getElementById('progressSolicitacoes').style.width = '85%';
-    document.getElementById('progressSolicitacoes').textContent = '85%';
-    
-    document.getElementById('progressPropostas').style.width = '72%';
-    document.getElementById('progressPropostas').textContent = '72%';
-    
-    document.getElementById('progressContratos').style.width = '58%';
-    document.getElementById('progressContratos').textContent = '58%';
-}
+      const data = await response.json();
 
-// Mostrar erro na tabela
-function mostrarErroTabela(mensagem) {
-    const tableBody = document.getElementById('usuariosTable');
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="6" class="text-center text-danger">
-                <i class="bi bi-exclamation-triangle"></i> 
-                ${mensagem}
-            </td>
-        </tr>
-    `;
-}
+      if (data.success) {
+        alert('Serviço removido com sucesso!');
+        loadServicesData();
+      } else {
+        alert('Erro ao remover serviço: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro de conexão ao remover serviço');
+    }
+  };
 
-// Logout
-function logout() {
+  // Event listeners para os modais
+  document.addEventListener('DOMContentLoaded', function () {
+    // Salvar alterações do serviço
+    document.getElementById('saveServiceBtn')?.addEventListener('click', async function () {
+      const serviceId = document.getElementById('editServiceId').value;
+      const formData = {
+        service_id: serviceId,
+        titulo: document.getElementById('editTitulo').value,
+        categoria: document.getElementById('editCategoria').value,
+        descricao: document.getElementById('editDescricao').value,
+        endereco: document.getElementById('editEndereco').value,
+        cidade: document.getElementById('editCidade').value,
+        orcamento_maximo: document.getElementById('editOrcamento').value,
+        prazo_desejado: document.getElementById('editPrazo').value,
+        status: document.getElementById('editStatus').value,
+        observacoes: document.getElementById('editObservacoes').value
+      };
+
+      try {
+        const response = await fetch('../php/admin/administrador-gerenciar.php', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Serviço atualizado com sucesso!');
+          bootstrap.Modal.getInstance(document.getElementById('editServiceModal')).hide();
+          loadServicesData();
+        } else {
+          alert('Erro ao atualizar serviço: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão ao atualizar serviço');
+      }
+    });
+  });
+
+  function showSection(sectionName) {
+    // Hide all sections
+    contentSections.forEach(section => {
+      section.classList.remove('active');
+    });
+
+    // Show target section
+    const targetSection = document.getElementById(sectionName + 'Section');
+    if (targetSection) {
+      targetSection.classList.add('active');
+    }
+
+    // Update page title
+    const titles = {
+      overview: 'Visão Geral',
+      services: 'Gerenciar Serviços',
+      users: 'Gerenciar Usuários',
+      proposals: 'Propostas',
+      contracts: 'Contratos',
+      reviews: 'Avaliações'
+    };
+
+    pageTitle.textContent = titles[sectionName] || 'Dashboard';
+
+    // Load section specific data
+    if (sectionName === 'services') {
+      loadServicesData();
+    }
+  }
+
+  function getStatusClass(status) {
+    const classes = {
+      'Pendente': 'bg-warning',
+      'Em Andamento': 'bg-info',
+      'Concluído': 'bg-success',
+      'Cancelado': 'bg-danger'
+    };
+    return classes[status] || 'bg-secondary';
+  }
+
+  function truncateText(text, length) {
+    if (!text) return '';
+    return text.length > length ? text.substring(0, length) + '...' : text;
+  }
+
+  function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  }
+
+  function updateCurrentDate() {
+    const now = new Date();
+    currentDate.textContent = now.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  async function logout() {
     if (confirm('Tem certeza que deseja sair?')) {
-        fetch('../php/logout.php')
-            .then(() => {
-                window.location.href = './login/admin-login.html';
-            })
-            .catch(error => {
-                console.error('Erro ao fazer logout:', error);
-                window.location.href = './login/admin-login.html';
-            });
+      try {
+        // Clear session
+        await fetch('../php/admin/logout.php', { method: 'POST' });
+        window.location.href = 'login/administrador-signin.html';
+      } catch (error) {
+        // Force redirect even if logout fails
+        window.location.href = 'login/administrador-signin.html';
+      }
     }
-}
+  }
+});
