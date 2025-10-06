@@ -120,7 +120,7 @@ try {
   // 🔐 Verificar se usuário está logado como cliente
   error_log("DEBUG: Verificando autenticação...");
   error_log("SESSION: " . print_r($_SESSION, true));
-  
+
   if (!isset($_SESSION['cliente_id']) || $_SESSION['usuario_tipo'] !== 'cliente') {
     error_log("ERROR: Usuário não autenticado ou não é cliente");
     enviarResposta(false, 'Acesso negado. Faça login como cliente.');
@@ -216,7 +216,6 @@ try {
       'solicitacao_id' => $solicitacaoId,
       'redirect' => '../cliente-dashboard.html'
     ]);
-
   } catch (PDOException $e) {
     error_log("Erro PDO em nova-solicitacao.php: " . $e->getMessage());
     error_log("SQL: " . $sql);
