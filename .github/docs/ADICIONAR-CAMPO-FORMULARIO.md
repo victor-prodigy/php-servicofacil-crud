@@ -12,9 +12,9 @@ Para adicionar um novo campo ao formulário de solicitação, você precisará m
 
 ## Estrutura dos Arquivos
 
-- **HTML**: `client/servico/solicitar-servico.html`
-- **JavaScript**: `assets/js/solicitar-servico.js`
-- **PHP**: `php/servico/solicitar-servico.php`
+- **HTML**: `client/servico/nova-solicitacao.html`
+- **JavaScript**: `assets/js/nova-solicitacao.js`
+- **PHP**: `php/servico/nova-solicitacao.php`
 - **CSS**: `assets/css/forms.css` (se necessário estilização específica)
 
 ## Passo a Passo
@@ -36,7 +36,7 @@ ADD COLUMN prioridade INT DEFAULT 1;
 
 ### 2. Modificar o HTML
 
-Localize o formulário em `client/servico/solicitar-servico.html` e adicione o novo campo:
+Localize o formulário em `client/servico/nova-solicitacao.html` e adicione o novo campo:
 
 ```html
 <!-- Adicione antes do botão de submit -->
@@ -77,7 +77,7 @@ Localize o formulário em `client/servico/solicitar-servico.html` e adicione o n
 
 ### 3. Atualizar o JavaScript
 
-Modifique `assets/js/solicitar-servico.js` para incluir validação:
+Modifique `assets/js/nova-solicitacao.js` para incluir validação:
 
 #### 3.1 Adicionar validação no evento submit:
 
@@ -102,7 +102,7 @@ formData.append('nome_do_campo', document.getElementById('nome_do_campo').value)
 
 **Exemplo completo da validação**:
 ```javascript
-document.getElementById('solicitar-servico-form').addEventListener('submit', async function(e) {
+document.getElementById('nova-solicitacao-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Validações existentes...
@@ -134,7 +134,7 @@ document.getElementById('solicitar-servico-form').addEventListener('submit', asy
 
 ### 4. Modificar o PHP
 
-Atualize `php/servico/solicitar-servico.php` para processar o novo campo:
+Atualize `php/servico/nova-solicitacao.php` para processar o novo campo:
 
 #### 4.1 Validar o campo recebido:
 
