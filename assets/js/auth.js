@@ -132,7 +132,7 @@ function handleSignup(form, userType) {
             // Redirect to signin page after success
             setTimeout(() => {
                 // Redirecionar para página unificada
-                window.location.href = 'signin.html';
+                window.location.href = 'login/index.html';
             }, 2000);
         } else {
             // Show error message

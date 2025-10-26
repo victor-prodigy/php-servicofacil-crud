@@ -25,29 +25,37 @@ USE servicofacil;
 -- ============================================
 -- INSERIR USUÁRIOS BASE
 -- ============================================
-INSERT INTO `user` (`user_id`, `email`, `password`, `name`, `phone_number`, `identity_verified`) VALUES
-(1, 'joao.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'João Silva', '(11) 99999-1111', TRUE),
-(2, 'maria.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Maria Santos', '(11) 99999-2222', TRUE),
-(3, 'pedro.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Pedro Costa', '(11) 99999-3333', FALSE),
-(4, 'ana.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ana Oliveira', '(11) 99999-4444', TRUE),
-(5, 'carlos.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Carlos Mendes', '(11) 99999-5555', TRUE),
-(6, 'juliana.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Juliana Ferreira', '(11) 99999-6666', TRUE);
+INSERT INTO `user` (`user_id`, `email`, `password`, `name`, `phone_number`, `user_type`, `status`, `identity_verified`) VALUES
+-- Administrador do Sistema
+(1, 'admin@servicofacil.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador do Sistema', '(11) 99999-9999', 'administrador', 'ativo', TRUE),
+-- Clientes
+(2, 'joao.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'João Silva', '(11) 99999-1111', 'cliente', 'ativo', TRUE),
+(3, 'pedro.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Pedro Costa', '(11) 99999-3333', 'cliente', 'ativo', FALSE),
+(4, 'carlos.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Carlos Mendes', '(11) 99999-5555', 'cliente', 'ativo', TRUE),
+(5, 'joao123@joao.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'João Teste', '(11) 99999-0001', 'cliente', 'ativo', TRUE),
+-- Prestadores
+(6, 'maria.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Maria Santos', '(11) 99999-2222', 'prestador', 'ativo', TRUE),
+(7, 'ana.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ana Oliveira', '(11) 99999-4444', 'prestador', 'ativo', TRUE),
+(8, 'juliana.prestadora@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Juliana Ferreira', '(11) 99999-6666', 'prestador', 'ativo', TRUE),
+(9, 'carlos123@carlos.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Carlos Teste', '(11) 99999-0002', 'prestador', 'ativo', TRUE);
 
 -- ============================================
 -- INSERIR CLIENTES
 -- ============================================
-INSERT INTO `cliente` (`id`, `user_id`, `email`, `senha`) VALUES
-(1, 1, 'joao.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-(2, 3, 'pedro.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'),
-(3, 5, 'carlos.cliente@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+INSERT INTO `cliente` (`id`, `user_id`) VALUES
+(1, 2), -- João Silva
+(2, 3), -- Pedro Costa  
+(3, 4), -- Carlos Mendes
+(4, 5); -- João Teste
 
 -- ============================================
 -- INSERIR PRESTADORES DE SERVIÇO
 -- ============================================
 INSERT INTO `service_provider` (`service_provider_id`, `user_id`, `specialty`, `location`) VALUES
-(1, 2, 'Encanamento', 'São Paulo, SP'),
-(2, 4, 'Elétrica', 'Rio de Janeiro, RJ'),
-(3, 6, 'Pintura', 'Belo Horizonte, MG');
+(1, 6, 'Encanamento', 'São Paulo, SP'),    -- Maria Santos
+(2, 7, 'Elétrica', 'Rio de Janeiro, RJ'),  -- Ana Oliveira
+(3, 8, 'Pintura', 'Belo Horizonte, MG'),   -- Juliana Ferreira
+(4, 9, 'Elétrica', 'São Paulo, SP');       -- Carlos Teste
 
 -- ============================================
 -- INSERIR SOLICITAÇÕES DE SERVIÇO

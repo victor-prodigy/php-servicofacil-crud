@@ -1,168 +1,119 @@
 <?php
+// 🔧 PRESTADOR SIGNUP - Clean Code & Normalized DB
+include "../conexao.php";
 
-/**
- * Prestador Signup
- * Processa o cadastro de novos prestadores de serviço
- */
+// 📝 Função para validar dados de entrada
+function validarDadosPrestador($dados)
+{
+  $erros = [];
 
-// Headers para resposta JSON
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+  if (empty($dados['name'])) {
+    $erros[] = "Nome é obrigatório";
+  }
 
-// Verificar se é uma requisição POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  http_response_code(405);
-  echo json_encode(['error' => 'Método não permitido']);
+  if (empty($dados['email']) || !filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
+    $erros[] = "Email válido é obrigatório";
+  }
+
+  if (empty($dados['password']) || strlen($dados['password']) < 6) {
+    $erros[] = "Senha deve ter pelo menos 6 caracteres";
+  }
+
+  if (empty($dados['specialty'])) {
+    $erros[] = "Especialidade é obrigatória";
+  }
+
+  if (empty($dados['location'])) {
+    $erros[] = "Localização é obrigatória";
+  }
+
+  return $erros;
+}
+
+// 🔒 Função para criar usuário
+function criarUsuario($pdo, $dados)
+{
+  $sql = "INSERT INTO user (email, password, name, phone_number, identity_verified) VALUES (?, ?, ?, ?, FALSE)";
+  $stmt = $pdo->prepare($sql);
+  $senha_hash = password_hash($dados['password'], PASSWORD_DEFAULT);
+
+  if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number']])) {
+    return $pdo->lastInsertId();
+  }
+  return false;
+}
+
+// 🔧 Função para criar prestador
+function criarPrestador($pdo, $user_id, $dados)
+{
+  $sql = "INSERT INTO service_provider (user_id, specialty, location) VALUES (?, ?, ?)";
+  $stmt = $pdo->prepare($sql);
+
+  if ($stmt->execute([$user_id, $dados['specialty'], $dados['location']])) {
+    return $pdo->lastInsertId();
+  }
+  return false;
+}
+
+// 📤 Função para enviar resposta
+function enviarResposta($success, $message, $data = [])
+{
+  header('Content-Type: application/json');
+  $resposta = [
+    'success' => $success,
+    'msg' => $message
+  ];
+
+  if (!empty($data)) {
+    $resposta = array_merge($resposta, $data);
+  }
+
+  echo json_encode($resposta);
   exit;
 }
 
-// Incluir arquivo de conexão
-require_once 'conexao.php';
-
+// 🚀 PROCESSO PRINCIPAL
 try {
-  // Receber e validar dados do formulário
-  $name = trim($_POST['name'] ?? '');
-  $email = trim($_POST['email'] ?? '');
-  $specialty = trim($_POST['specialty'] ?? '');
-  $location = trim($_POST['location'] ?? '');
-  $password = $_POST['password'] ?? '';
-  $confirm_password = $_POST['confirm_password'] ?? '';
-  $user_type = $_POST['user_type'] ?? '';
-
-  // Validações básicas
-  if (empty($name)) {
-    throw new Exception('Nome é obrigatório');
-  }
-
-  if (empty($email)) {
-    throw new Exception('E-mail é obrigatório');
-  }
-
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    throw new Exception('E-mail inválido');
-  }
-
-  if (empty($specialty)) {
-    throw new Exception('Especialidade é obrigatória');
-  }
-
-  if (empty($location)) {
-    throw new Exception('Localização é obrigatória');
-  }
-
-  if (empty($password)) {
-    throw new Exception('Senha é obrigatória');
-  }
-
-  if (strlen($password) < 6) {
-    throw new Exception('Senha deve ter pelo menos 6 caracteres');
-  }
-
-  if ($password !== $confirm_password) {
-    throw new Exception('As senhas não coincidem');
-  }
-
-  if ($user_type !== 'service_provider') {
-    throw new Exception('Tipo de usuário inválido');
-  }
-
-  // Validar especialidade
-  $valid_specialties = [
-    'Encanamento',
-    'Elétrica',
-    'Pintura',
-    'Limpeza',
-    'Jardinagem',
-    'Marcenaria',
-    'Pedreiro',
-    'Mecânica',
-    'Informática',
-    'Outros'
+  // 📋 Coleta de dados
+  $dados = [
+    'name' => $_POST['name'] ?? '',
+    'email' => $_POST['email'] ?? '',
+    'phone_number' => $_POST['phone_number'] ?? null,
+    'password' => $_POST['password'] ?? '',
+    'specialty' => $_POST['specialty'] ?? '',
+    'location' => $_POST['location'] ?? ''
   ];
 
-  if (!in_array($specialty, $valid_specialties)) {
-    throw new Exception('Especialidade inválida');
+  // ✅ Validação
+  $erros = validarDadosPrestador($dados);
+  if (!empty($erros)) {
+    enviarResposta(false, implode(', ', $erros));
   }
 
-  // Verificar se o e-mail já existe
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM user WHERE email = ?");
-  $stmt->execute([$email]);
-  if ($stmt->fetchColumn() > 0) {
-    throw new Exception('Este e-mail já está cadastrado');
+  // 🔍 Verifica se email já existe
+  $stmt = $pdo->prepare("SELECT user_id FROM user WHERE email = ?");
+  $stmt->execute([$dados['email']]);
+  if ($stmt->fetch()) {
+    enviarResposta(false, "Email já está em uso");
   }
 
-  // Verificar na tabela service_provider também
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM service_provider WHERE email = ?");
-  $stmt->execute([$email]);
-  if ($stmt->fetchColumn() > 0) {
-    throw new Exception('Este e-mail já está cadastrado como prestador');
+  // 💾 Criação do usuário
+  $user_id = criarUsuario($pdo, $dados);
+  if (!$user_id) {
+    enviarResposta(false, "Erro ao criar usuário");
   }
 
-  // Iniciar transação
-  $pdo->beginTransaction();
+  // 🔧 Criação do prestador
+  $prestador_id = criarPrestador($pdo, $user_id, $dados);
+  if (!$prestador_id) {
+    enviarResposta(false, "Erro ao criar prestador");
+  }
 
-  // Hash da senha
-  $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-  // Inserir na tabela user primeiro
-  $stmt = $pdo->prepare("
-        INSERT INTO user (email, password, name, phone_number, identity_verified) 
-        VALUES (?, ?, ?, NULL, FALSE)
-    ");
-  $stmt->execute([$email, $hashed_password, $name]);
-  $user_id = $pdo->lastInsertId();
-
-  // Inserir na tabela service_provider
-  $stmt = $pdo->prepare("
-        INSERT INTO service_provider (user_id, email, password, name, specialty, location, identity_verified) 
-        VALUES (?, ?, ?, ?, ?, ?, FALSE)
-    ");
-  $stmt->execute([$user_id, $email, $hashed_password, $name, $specialty, $location]);
-  $service_provider_id = $pdo->lastInsertId();
-
-  // Confirmar transação
-  $pdo->commit();
-
-  // Resposta de sucesso
-  echo json_encode([
-    'success' => true,
-    'message' => 'Prestador cadastrado com sucesso!',
-    'data' => [
-      'user_id' => $user_id,
-      'service_provider_id' => $service_provider_id,
-      'name' => $name,
-      'email' => $email,
-      'specialty' => $specialty,
-      'location' => $location
-    ]
+  // ✨ Sucesso
+  enviarResposta(true, "Prestador cadastrado com sucesso", [
+    'user_id' => $user_id,
+    'prestador_id' => $prestador_id
   ]);
 } catch (Exception $e) {
-  // Reverter transação em caso de erro
-  if ($pdo->inTransaction()) {
-    $pdo->rollBack();
-  }
-
-  // Resposta de erro
-  http_response_code(400);
-  echo json_encode([
-    'success' => false,
-    'error' => $e->getMessage()
-  ]);
-} catch (PDOException $e) {
-  // Reverter transação em caso de erro de banco
-  if ($pdo->inTransaction()) {
-    $pdo->rollBack();
-  }
-
-  // Log do erro (em produção, não mostrar detalhes do banco)
-  error_log("Erro de banco no cadastro de prestador: " . $e->getMessage());
-
-  // Resposta de erro genérica
-  http_response_code(500);
-  echo json_encode([
-    'success' => false,
-    'error' => 'Erro interno do servidor. Tente novamente.'
-  ]);
+  enviarResposta(false, "Erro interno do servidor");
 }

@@ -1,139 +1,106 @@
 <?php
+// 🛡️ CLIENTE SIGNUP - Clean Code & Normalized DB
+include "../conexao.php";
 
-/**
- * Cliente Signup
- * Processa o cadastro de novos clientes
- */
-
-// Headers para resposta JSON
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Verificar se é uma requisição POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  http_response_code(405);
-  echo json_encode(['error' => 'Método não permitido']);
-  exit;
+// 📝 Função para validar dados de entrada
+function validarDadosCliente($dados) {
+    $erros = [];
+    
+    if (empty($dados['name'])) {
+        $erros[] = "Nome é obrigatório";
+    }
+    
+    if (empty($dados['email']) || !filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
+        $erros[] = "Email válido é obrigatório";
+    }
+    
+    if (empty($dados['password']) || strlen($dados['password']) < 6) {
+        $erros[] = "Senha deve ter pelo menos 6 caracteres";
+    }
+    
+    return $erros;
 }
 
-// Incluir arquivo de conexão
-require_once 'conexao.php';
+// 🔒 Função para criar usuário
+function criarUsuario($pdo, $dados) {
+    $sql = "INSERT INTO user (email, password, name, phone_number, identity_verified) VALUES (?, ?, ?, ?, FALSE)";
+    $stmt = $pdo->prepare($sql);
+    $senha_hash = password_hash($dados['password'], PASSWORD_DEFAULT);
+    
+    if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number']])) {
+        return $pdo->lastInsertId();
+    }
+    return false;
+}
 
+// 👤 Função para criar cliente
+function criarCliente($pdo, $user_id) {
+    $sql = "INSERT INTO cliente (user_id) VALUES (?)";
+    $stmt = $pdo->prepare($sql);
+    
+    if ($stmt->execute([$user_id])) {
+        return $pdo->lastInsertId();
+    }
+    return false;
+}
+
+// 📤 Função para enviar resposta
+function enviarResposta($success, $message, $data = []) {
+    header('Content-Type: application/json');
+    $resposta = [
+        'success' => $success,
+        'msg' => $message
+    ];
+    
+    if (!empty($data)) {
+        $resposta = array_merge($resposta, $data);
+    }
+    
+    echo json_encode($resposta);
+    exit;
+}
+
+// 🚀 PROCESSO PRINCIPAL
 try {
-  // Receber e validar dados do formulário
-  $name = trim($_POST['name'] ?? '');
-  $email = trim($_POST['email'] ?? '');
-  $phone_number = trim($_POST['phone_number'] ?? '');
-  $password = $_POST['password'] ?? '';
-  $confirm_password = $_POST['confirm_password'] ?? '';
-  $user_type = $_POST['user_type'] ?? '';
-
-  // Validações básicas
-  if (empty($name)) {
-    throw new Exception('Nome é obrigatório');
-  }
-
-  if (empty($email)) {
-    throw new Exception('E-mail é obrigatório');
-  }
-
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    throw new Exception('E-mail inválido');
-  }
-
-  if (empty($password)) {
-    throw new Exception('Senha é obrigatória');
-  }
-
-  if (strlen($password) < 6) {
-    throw new Exception('Senha deve ter pelo menos 6 caracteres');
-  }
-
-  if ($password !== $confirm_password) {
-    throw new Exception('As senhas não coincidem');
-  }
-
-  if ($user_type !== 'customer') {
-    throw new Exception('Tipo de usuário inválido');
-  }
-
-  // Verificar se o e-mail já existe
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM user WHERE email = ?");
-  $stmt->execute([$email]);
-  if ($stmt->fetchColumn() > 0) {
-    throw new Exception('Este e-mail já está cadastrado');
-  }
-
-  // Verificar na tabela customer também
-  $stmt = $pdo->prepare("SELECT COUNT(*) FROM customer WHERE email = ?");
-  $stmt->execute([$email]);
-  if ($stmt->fetchColumn() > 0) {
-    throw new Exception('Este e-mail já está cadastrado como cliente');
-  }
-
-  // Iniciar transação
-  $pdo->beginTransaction();
-
-  // Hash da senha
-  $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-  // Inserir na tabela user primeiro
-  $stmt = $pdo->prepare("
-        INSERT INTO user (email, password, name, phone_number, identity_verified) 
-        VALUES (?, ?, ?, ?, FALSE)
-    ");
-  $stmt->execute([$email, $hashed_password, $name, $phone_number]);
-  $user_id = $pdo->lastInsertId();
-
-  // Inserir na tabela customer
-  $stmt = $pdo->prepare("
-        INSERT INTO customer (user_id, email, password, name, phone_number, identity_verified) 
-        VALUES (?, ?, ?, ?, ?, FALSE)
-    ");
-  $stmt->execute([$user_id, $email, $hashed_password, $name, $phone_number]);
-  $customer_id = $pdo->lastInsertId();
-
-  // Confirmar transação
-  $pdo->commit();
-
-  // Resposta de sucesso
-  echo json_encode([
-    'success' => true,
-    'message' => 'Cliente cadastrado com sucesso!',
-    'data' => [
-      'user_id' => $user_id,
-      'customer_id' => $customer_id,
-      'name' => $name,
-      'email' => $email
-    ]
-  ]);
+    // 📋 Coleta de dados
+    $dados = [
+        'name' => $_POST['name'] ?? '',
+        'email' => $_POST['email'] ?? '',
+        'phone_number' => $_POST['phone_number'] ?? '',
+        'password' => $_POST['password'] ?? ''
+    ];
+    
+    // ✅ Validação
+    $erros = validarDadosCliente($dados);
+    if (!empty($erros)) {
+        enviarResposta(false, implode(', ', $erros));
+    }
+    
+    // 🔍 Verifica se email já existe
+    $stmt = $pdo->prepare("SELECT user_id FROM user WHERE email = ?");
+    $stmt->execute([$dados['email']]);
+    if ($stmt->fetch()) {
+        enviarResposta(false, "Email já está em uso");
+    }
+    
+    // 💾 Criação do usuário
+    $user_id = criarUsuario($pdo, $dados);
+    if (!$user_id) {
+        enviarResposta(false, "Erro ao criar usuário");
+    }
+    
+    // 👤 Criação do cliente
+    $cliente_id = criarCliente($pdo, $user_id);
+    if (!$cliente_id) {
+        enviarResposta(false, "Erro ao criar cliente");
+    }
+    
+    // ✨ Sucesso
+    enviarResposta(true, "Cliente cadastrado com sucesso", [
+        'user_id' => $user_id,
+        'cliente_id' => $cliente_id
+    ]);
+    
 } catch (Exception $e) {
-  // Reverter transação em caso de erro
-  if ($pdo->inTransaction()) {
-    $pdo->rollBack();
-  }
-
-  // Resposta de erro
-  http_response_code(400);
-  echo json_encode([
-    'success' => false,
-    'error' => $e->getMessage()
-  ]);
-} catch (PDOException $e) {
-  // Reverter transação em caso de erro de banco
-  if ($pdo->inTransaction()) {
-    $pdo->rollBack();
-  }
-
-  // Log do erro (em produção, não mostrar detalhes do banco)
-  error_log("Erro de banco no cadastro de cliente: " . $e->getMessage());
-
-  // Resposta de erro genérica
-  http_response_code(500);
-  echo json_encode([
-    'success' => false,
-    'error' => 'Erro interno do servidor. Tente novamente.'
-  ]);
+    enviarResposta(false, "Erro interno do servidor");
 }

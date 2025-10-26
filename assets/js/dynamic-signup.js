@@ -1,236 +1,249 @@
 /**
- * Dynamic Signup JavaScript
- * Gerencia o formulário dinâmico de cadastro único
+ * ✅ SISTEMA DE CADASTRO UNIFICADO
+ * Gerencia registro de Cliente e Prestador
  */
 
-let currentUserType = 'customer';
+// 🎯 Variável global: tipo de usuário ativo
+let userType = 'cliente';
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeDynamicForm();
-    setupProfileSelection();
-    setupFormSubmission();
-});
+// 🚀 Inicialização automática quando página carrega
+document.addEventListener('DOMContentLoaded', initializeSignupForm);
 
 /**
- * Inicializa o formulário dinâmico
+ * 🔧 Configura o formulário de cadastro
  */
-function initializeDynamicForm() {
-    // Definir cliente como padrão
-    switchUserType('customer');
+function initializeSignupForm() {
+    setUserType('cliente');     // Cliente como padrão
+    setupUserSelection();       // Configurar seleção de perfil
+    setupFormHandler();         // Configurar envio do formulário
 }
 
 /**
- * Configura a seleção de perfil
+ * 👥 Configura seleção entre Cliente e Prestador
  */
-function setupProfileSelection() {
-    const clienteCard = document.getElementById('cliente-card');
-    const prestadorCard = document.getElementById('prestador-card');
-
-    clienteCard.addEventListener('click', () => {
-        switchUserType('customer');
-    });
-
-    prestadorCard.addEventListener('click', () => {
-        switchUserType('service_provider');
-    });
+function setupUserSelection() {
+    document.getElementById('cliente-card').onclick = () => setUserType('cliente');
+    document.getElementById('prestador-card').onclick = () => setUserType('service_provider');
 }
 
 /**
- * Alterna entre os tipos de usuário
+ * 🔄 Define o tipo de usuário ativo
  */
-function switchUserType(userType) {
-    currentUserType = userType;
-    
+function setUserType(type) {
+    userType = type;
+
+    const isClient = (type === 'cliente');
+
+    // Atualizar interface visual
+    updateCardStyles(isClient);
+    updateFormElements(isClient);
+    toggleUserFields(isClient);
+}
+
+/**
+ * 🎨 Atualiza estilos dos cartões de seleção
+ */
+function updateCardStyles(isClient) {
     const clienteCard = document.getElementById('cliente-card');
     const prestadorCard = document.getElementById('prestador-card');
+
+    clienteCard.className = isClient ? 'profile-card active' : 'profile-card inactive';
+    prestadorCard.className = isClient ? 'profile-card inactive' : 'profile-card active';
+}
+
+/**
+ * 📝 Atualiza elementos do formulário
+ */
+function updateFormElements(isClient) {
+    document.getElementById('user_type').value = isClient ? 'cliente' : 'service_provider';
+    document.getElementById('submit-btn').textContent = isClient ? 'Cadastrar como Cliente' : 'Cadastrar como Prestador';
+}
+
+/**
+ * 🔀 Alterna campos específicos do usuário
+ */
+function toggleUserFields(isClient) {
     const clienteFields = document.getElementById('cliente-fields');
     const prestadorFields = document.getElementById('prestador-fields');
-    const userTypeInput = document.getElementById('user_type');
-    const submitBtn = document.getElementById('submit-btn');
-    const signinLink = document.getElementById('signin-link');
-    
-    // Remover classes ativas
-    clienteCard.classList.remove('active', 'inactive');
-    prestadorCard.classList.remove('active', 'inactive');
-    
-    if (userType === 'customer') {
-        // Ativar cliente
-        clienteCard.classList.add('active');
-        prestadorCard.classList.add('inactive');
-        
+
+    if (isClient) {
         // Mostrar campos do cliente
         clienteFields.style.display = 'block';
         prestadorFields.style.display = 'none';
-        
-        // Atualizar campos obrigatórios
-        setFieldsRequired(true, ['phone_number']);
-        setFieldsRequired(false, ['specialty', 'location']);
-        
-        // Atualizar form action e textos
-        userTypeInput.value = 'customer';
-        submitBtn.textContent = 'Cadastrar como Cliente';
-        signinLink.href = 'signin.html';
-        
+
+        // Configurar campos obrigatórios
+        setFieldRequired('phone_number', true);
+        setFieldRequired('specialty', false);
+        setFieldRequired('location', false);
+
         // Limpar campos do prestador
-        document.getElementById('specialty').value = '';
-        document.getElementById('location').value = '';
-        
-    } else if (userType === 'service_provider') {
-        // Ativar prestador
-        prestadorCard.classList.add('active');
-        clienteCard.classList.add('inactive');
-        
+        clearField('specialty');
+        clearField('location');
+    } else {
         // Mostrar campos do prestador
         clienteFields.style.display = 'none';
         prestadorFields.style.display = 'block';
-        
-        // Atualizar campos obrigatórios
-        setFieldsRequired(false, ['phone_number']);
-        setFieldsRequired(true, ['specialty', 'location']);
-        
-        // Atualizar form action e textos
-        userTypeInput.value = 'service_provider';
-        submitBtn.textContent = 'Cadastrar como Prestador';
-        signinLink.href = 'signin.html';
-        
+
+        // Configurar campos obrigatórios
+        setFieldRequired('phone_number', false);
+        setFieldRequired('specialty', true);
+        setFieldRequired('location', true);
+
         // Limpar campo do cliente
-        document.getElementById('phone_number').value = '';
+        clearField('phone_number');
     }
-    
-    // Adicionar animação suave
-    setTimeout(() => {
-        const visibleFields = userType === 'customer' ? clienteFields : prestadorFields;
-        visibleFields.style.opacity = '0';
-        setTimeout(() => {
-            visibleFields.style.opacity = '1';
-        }, 150);
-    }, 100);
 }
 
 /**
- * Define campos como obrigatórios ou opcionais
+ * 📋 Configura envio do formulário
  */
-function setFieldsRequired(required, fieldNames) {
-    fieldNames.forEach(fieldName => {
-        const field = document.getElementById(fieldName);
-        if (field) {
-            if (required) {
-                field.setAttribute('required', '');
-            } else {
-                field.removeAttribute('required');
-            }
-        }
-    });
-}
-
-/**
- * Configura o envio do formulário
- */
-function setupFormSubmission() {
-    const form = document.getElementById('dynamicSignupForm');
-    
-    form.addEventListener('submit', function(e) {
+function setupFormHandler() {
+    document.getElementById('dynamicSignupForm').onsubmit = function (e) {
         e.preventDefault();
-        handleFormSubmission();
-    });
+        handleSignup();
+    };
 }
 
 /**
- * Processa o envio do formulário
+ * ✅ Processa o cadastro do usuário
  */
-function handleFormSubmission() {
+function handleSignup() {
     const form = document.getElementById('dynamicSignupForm');
-    const formData = new FormData(form);
-    const submitButton = document.getElementById('submit-btn');
-    const alertArea = document.getElementById('alert-area');
-    
+    const button = document.getElementById('submit-btn');
+    const alerts = document.getElementById('alert-area');
+
     // Validar senhas
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirm_password').value;
-    
-    if (password !== confirmPassword) {
-        showAlert('danger', 'As senhas não coincidem', alertArea);
+    if (!validatePasswords()) {
+        showAlert('danger', 'As senhas não coincidem', alerts);
         return;
     }
-    
-    // Determinar endpoint baseado no tipo de usuário
-    const endpoint = '../app/universal-signup.php';
-    
-    // Show loading state
-    const originalText = submitButton.textContent;
-    submitButton.textContent = 'Cadastrando...';
-    submitButton.disabled = true;
-    
-    // Clear previous alerts
-    alertArea.innerHTML = '';
-    
+
+    // Preparar dados do formulário
+    const formData = new FormData(form);
+
+    // Mostrar estado de carregamento
+    showLoading(button);
+    clearAlerts(alerts);
+
+    // Fazer requisição de cadastro
+    sendSignupRequest(formData, form, button, alerts);
+}
+
+/**
+ * 🔒 Valida se as senhas coincidem
+ */
+function validatePasswords() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    return password === confirmPassword;
+}
+
+/**
+ * 🏷️ Define se campo é obrigatório
+ */
+function setFieldRequired(fieldId, required) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        if (required) {
+            field.setAttribute('required', '');
+        } else {
+            field.removeAttribute('required');
+        }
+    }
+}
+
+/**
+ * 🧹 Limpa valor do campo
+ */
+function clearField(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field) field.value = '';
+}
+
+/**
+ * ⏳ Mostra estado de carregamento no botão
+ */
+function showLoading(button) {
+    button.originalText = button.textContent;
+    button.textContent = 'Cadastrando...';
+    button.disabled = true;
+}
+
+/**
+ * 🧹 Limpa alertas anteriores
+ */
+function clearAlerts(alertContainer) {
+    alertContainer.innerHTML = '';
+}
+
+/**
+ * 🌐 Envia requisição de cadastro para o servidor
+ */
+function sendSignupRequest(formData, form, button, alerts) {
+    // 🎯 Endpoint específico baseado no tipo de usuário
+    const endpoint = getSignupEndpoint();
+
     fetch(endpoint, {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show success message
-            showAlert('success', data.message, alertArea);
-            
-            // Reset form after success
-            setTimeout(() => {
-                form.reset();
-                // Redirect to unified signin page
-                window.location.href = 'signin.html';
-            }, 2000);
-        } else {
-            // Show error message
-            showAlert('danger', data.error, alertArea);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('danger', 'Erro de conexão. Tente novamente.', alertArea);
-    })
-    .finally(() => {
-        // Reset button state
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
-    });
+        .then(response => response.json())
+        .then(data => handleSignupResponse(data, form, button, alerts))
+        .catch(error => handleSignupError(error, button, alerts))
+        .finally(() => resetButton(button));
 }
 
 /**
- * Show alert message
+ * 🎯 Retorna endpoint específico para o tipo de usuário
+ */
+function getSignupEndpoint() {
+    return userType === 'cliente'
+        ? '../../php/cliente/cliente-signup.php'
+        : '../../php/prestador/prestador-signup.php';
+}
+
+/**
+ * ✅ Trata resposta de cadastro bem-sucedida
+ */
+function handleSignupResponse(data, form, button, alerts) {
+    if (data.success) {
+        showAlert('success', data.message, alerts);
+        setTimeout(() => {
+            form.reset();
+            window.location.href = '../login/index.html';
+        }, 2000);
+    } else {
+        showAlert('danger', data.message || 'Erro no cadastro', alerts);
+    }
+}
+
+/**
+ * ❌ Trata erros de cadastro
+ */
+function handleSignupError(error, button, alerts) {
+    console.error('Erro de cadastro:', error);
+    showAlert('danger', 'Erro de conexão. Tente novamente.', alerts);
+}
+
+/**
+ * 🔄 Restaura estado original do botão
+ */
+function resetButton(button) {
+    button.textContent = button.originalText;
+    button.disabled = false;
+}
+
+/**
+ * 🚨 Exibe alerta de sucesso ou erro
  */
 function showAlert(type, message, container) {
     const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-    const iconClass = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
-    
-    const alertHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="${type}:">
-                <use xlink:href="#${iconClass}"/>
-            </svg>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    
-    container.innerHTML = alertHTML;
-    
-    // Add Bootstrap icons if not already present
-    if (!document.getElementById('bootstrap-icons')) {
-        const iconsHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                </symbol>
-                <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                </symbol>
-            </svg>
-        `;
-        
-        const div = document.createElement('div');
-        div.id = 'bootstrap-icons';
-        div.innerHTML = iconsHTML;
-        document.body.appendChild(div);
-    }
+    const icon = type === 'success' ? '✅' : '❌';
+
+    container.innerHTML = `
+    <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+      ${icon} ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
 }

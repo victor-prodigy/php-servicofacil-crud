@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function carregarDetalhesServico(id) {
     try {
-        const response = await fetch(`../../php/servico/servico-detalhe.php?id=${id}`);
+        const response = await fetch(`../../php/servico/detalhe-servico.php?id=${id}`);
         const data = await response.json();
 
         if (!data.success) {
@@ -68,7 +68,7 @@ async function excluirServico(id) {
         const formData = new FormData();
         formData.append('servico_id', id);
 
-        const response = await fetch('../../php/servico/servico-excluir.php', {
+        const response = await fetch('../../php/servico/apaga-servico.php', {
             method: 'POST',
             body: formData
         });

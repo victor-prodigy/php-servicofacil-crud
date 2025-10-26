@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $query = "SELECT id, titulo, descricao, categoria, orcamento, prazo, localizacao, status, data_postagem 
                   FROM servicos 
                   WHERE id = ? AND cliente_id = ?";
-        
+
         $stmt = $conn->prepare($query);
         $stmt->bind_param("ii", $servico_id, $cliente_id);
         $stmt->execute();
@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             'success' => true,
             'servico' => $servico
         ]);
-
     } catch (Exception $e) {
         echo json_encode([
             'success' => false,
@@ -49,4 +48,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 } else {
     echo json_encode(['success' => false, 'message' => 'Método não permitido']);
 }
-?>

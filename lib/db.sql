@@ -9,6 +9,8 @@ CREATE TABLE `user` (
     `password` VARCHAR(255) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `phone_number` VARCHAR(15) DEFAULT NULL,
+    `user_type` ENUM('cliente', 'prestador', 'administrador') DEFAULT 'cliente',
+    `status` ENUM('ativo', 'inativo') DEFAULT 'ativo',
     `identity_verified` BOOLEAN DEFAULT FALSE,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -22,10 +24,7 @@ CREATE TABLE `user` (
 CREATE TABLE `cliente` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `user_id` INT(11) NOT NULL,
-    `email` VARCHAR(255) NOT NULL,
-    `senha` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `email` (`email`),
     KEY `fk_cliente_user` (`user_id`),
     CONSTRAINT `fk_cliente_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 );
@@ -49,15 +48,39 @@ CREATE TABLE `service_provider` (
 CREATE TABLE `service_request` (
     `request_id` INT(11) NOT NULL AUTO_INCREMENT,
     `cliente_id` INT(11) NOT NULL,
-    `service_type` VARCHAR(50) NOT NULL,
-    `location` VARCHAR(100) NOT NULL,
-    `deadline` DATE DEFAULT NULL,
-    `budget` DECIMAL(10,2) DEFAULT NULL,
-    `photos` VARCHAR(200) DEFAULT NULL,
+    `titulo` VARCHAR(200) NOT NULL,
+    `categoria` VARCHAR(50) NOT NULL,
+    `descricao` TEXT NOT NULL,
+    `endereco` VARCHAR(200) NOT NULL,
+    `cidade` VARCHAR(100) NOT NULL,
+    `prazo_desejado` DATE DEFAULT NULL,
+    `orcamento_maximo` DECIMAL(10,2) DEFAULT NULL,
+    `observacoes` TEXT DEFAULT NULL,
+    `status` VARCHAR(20) DEFAULT 'pendente',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`request_id`),
     KEY `fk_service_request_cliente` (`cliente_id`),
     CONSTRAINT `fk_service_request_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE
+);
+
+-- ============================================
+-- TABELA: SERVICOS (Compatibilidade com código PHP)
+-- ============================================
+CREATE TABLE `servicos` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `cliente_id` INT(11) NOT NULL,
+    `titulo` VARCHAR(200) NOT NULL,
+    `descricao` TEXT NOT NULL,
+    `categoria` VARCHAR(50) NOT NULL,
+    `orcamento` DECIMAL(10,2) DEFAULT NULL,
+    `prazo` DATE DEFAULT NULL,
+    `localizacao` VARCHAR(100) NOT NULL,
+    `status` VARCHAR(20) DEFAULT 'aberto',
+    `data_postagem` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `fk_servicos_cliente` (`cliente_id`),
+    CONSTRAINT `fk_servicos_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE
 );
 
 -- ============================================
@@ -144,4 +167,33 @@ CREATE TABLE `chat` (
     KEY `fk_chat_service_provider` (`service_provider_id`),
     CONSTRAINT `fk_chat_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_chat_service_provider` FOREIGN KEY (`service_provider_id`) REFERENCES `service_provider` (`service_provider_id`) ON DELETE CASCADE
+);
+
+-- ============================================
+-- SEED DATA - USUÁRIO ADMINISTRADOR
+-- ============================================
+-- Inserir usuário administrador padrão
+-- Email: admin@servicofacil.com
+-- Senha: admin123 (hash MD5: 0192023a7bbd73250516f069df18b500)
+-- Senha: admin123 (hash bcrypt: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi)
+INSERT INTO `user` (
+    `email`, 
+    `password`, 
+    `name`, 
+    `phone_number`, 
+    `user_type`, 
+    `status`, 
+    `identity_verified`, 
+    `created_at`, 
+    `updated_at`
+) VALUES (
+    'admin@servicofacil.com',
+    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    'Administrador do Sistema',
+    '(11) 99999-9999',
+    'administrador',
+    'ativo',
+    TRUE,
+    NOW(),
+    NOW()
 );

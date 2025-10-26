@@ -1,22 +1,40 @@
 <?php
+// NOTE: iniciar sessão
 session_start();
 
-// Verificar se o usuário está logado e é um cliente
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'cliente') {
-    $response = [
+// NOTE: verificar se é cliente logado
+if (!isset($_SESSION['usuario_tipo']) || $_SESSION['usuario_tipo'] !== 'cliente') {
+    $resposta = [
         'authenticated' => false,
-        'message' => 'Acesso não autorizado. Faça login como cliente.'
+        'message' => 'Acesso negado. Faça login como cliente.'
     ];
-    echo json_encode($response);
-    exit;
+} else {
+    // Buscar dados do usuário no banco se não estiverem na sessão
+    if (!isset($_SESSION['nome']) || !isset($_SESSION['email'])) {
+        require_once '../conexao.php';
+
+        try {
+            $stmt = $pdo->prepare("SELECT name, email FROM user WHERE user_id = ?");
+            $stmt->execute([$_SESSION['usuario_id']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                $_SESSION['nome'] = $user['name'];
+                $_SESSION['email'] = $user['email'];
+            }
+        } catch (Exception $e) {
+            error_log("Erro ao buscar dados do usuário: " . $e->getMessage());
+        }
+    }
+
+    $resposta = [
+        'authenticated' => true,
+        'usuario_id' => $_SESSION['usuario_id'],
+        'nome' => $_SESSION['nome'] ?? 'Usuário',
+        'email' => $_SESSION['email'] ?? '',
+        'usuario_tipo' => $_SESSION['usuario_tipo']
+    ];
 }
 
-// Se chegou aqui, o usuário está autenticado como cliente
-$response = [
-    'authenticated' => true,
-    'user_id' => $_SESSION['user_id'],
-    'nome' => $_SESSION['nome'] ?? 'Cliente'
-];
-
-echo json_encode($response);
-?>
+header('Content-Type: application/json');
+echo json_encode($resposta);
