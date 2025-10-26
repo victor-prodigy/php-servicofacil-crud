@@ -18,9 +18,10 @@ async function checkAuthentication() {
         document.getElementById('userName').textContent = data.nome;
         document.getElementById('dashboardContent').style.display = 'block';
 
-        // Carregar a lista de serviços e solicitações
+        // Carregar a lista de serviços, solicitações e contratos
         carregarServicos();
         carregarSolicitacoes();
+        carregarContratos();
 
     } catch (error) {
         console.error('Erro ao verificar autenticação:', error);
@@ -323,6 +324,96 @@ async function excluirSolicitacao(id) {
     } catch (error) {
         console.error('Erro ao excluir solicitação:', error);
         alert('Erro ao excluir solicitação: ' + error.message);
+    }
+}
+
+// Função para carregar contratos do cliente
+async function carregarContratos() {
+    try {
+        const response = await fetch('../php/servico/listar-contratos-cliente.php');
+        const data = await response.json();
+
+        const tableBody = document.getElementById('contratosTable');
+        tableBody.innerHTML = ''; // Limpar tabela
+
+        if (!data.success || data.contratos.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        <i class="bi bi-inbox"></i> 
+                        Nenhum contrato encontrado.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Adicionar cada contrato à tabela
+        data.contratos.forEach(contrato => {
+            const row = document.createElement('tr');
+
+            const dataFormatada = new Date(contrato.created_at).toLocaleDateString('pt-BR');
+
+            // Definir badge de status
+            let statusBadge = '';
+            if (contrato.status === 'completed') {
+                statusBadge = '<span class="badge bg-success">Concluído</span>';
+            } else if (contrato.status === 'active') {
+                statusBadge = '<span class="badge bg-primary">Ativo</span>';
+            } else if (contrato.status === 'cancelled') {
+                statusBadge = '<span class="badge bg-danger">Cancelado</span>';
+            } else {
+                statusBadge = '<span class="badge bg-secondary">Pendente</span>';
+            }
+
+            // Gerar coluna de avaliação baseada no status
+            let avaliacaoHtml = '';
+            if (contrato.status === 'completed' && contrato.ja_avaliado == 0) {
+                avaliacaoHtml = `
+                    <a href="./servico/avaliar-prestador.html?contract_id=${contrato.contract_id}" 
+                       class="btn btn-sm btn-warning">
+                        <i class="bi bi-star-fill"></i> Avaliar
+                    </a>
+                `;
+            } else if (contrato.ja_avaliado == 1) {
+                avaliacaoHtml = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Já avaliado</span>';
+            } else {
+                avaliacaoHtml = '<span class="badge bg-secondary">Aguardando conclusão</span>';
+            }
+
+            row.innerHTML = `
+                <td>
+                    <strong>${contrato.titulo}</strong>
+                </td>
+                <td>
+                    ${contrato.prestador_nome}
+                    <br>
+                    <small class="text-muted">${contrato.specialty || 'Sem especialidade'}</small>
+                </td>
+                <td>
+                    <span class="badge bg-info">${contrato.categoria}</span>
+                </td>
+                <td>${statusBadge}</td>
+                <td>
+                    <small>${dataFormatada}</small>
+                </td>
+                <td>${avaliacaoHtml}</td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar contratos:', error);
+        const tableBody = document.getElementById('contratosTable');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    Erro ao carregar contratos: ${error.message}
+                </td>
+            </tr>
+        `;
     }
 }
 

@@ -151,54 +151,122 @@ async function carregarServicosClientes() {
                 'A combinar';
 
             // Formatar prazo
-            const prazo = servico.prazo ? 
-                new Date(servico.prazo).toLocaleDateString('pt-BR') : 
+            const prazo = servico.prazo ?
+                new Date(servico.prazo).toLocaleDateString('pt-BR') :
                 'Flexível';
 
-            row.innerHTML = `
-                <td>
-                    <strong>${servico.titulo}</strong>
-                    <br>
-                    <small class="text-muted">${servico.descricao.substring(0, 50)}${servico.descricao.length > 50 ? '...' : ''}</small>
-                </td>
-                <td>
-                    <span class="badge bg-success">${servico.categoria}</span>
-                </td>
-                <td>
-                    <strong>${servico.cliente_nome}</strong>
-                </td>
-                <td>
-                    <strong class="text-success">${orcamento}</strong>
-                </td>
-                <td>
-                    <small>${prazo}</small>
-                </td>
-                <td>
-                    <small>${servico.localizacao}</small>
-                </td>
-                <td>
-                    <span class="badge ${getStatusClassServico(servico.status)}">
-                        ${getStatusTextServico(servico.status)}
-                    </span>
-                </td>
-                <td>
-                    <small>${dataFormatada}</small>
-                </td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-outline-primary" 
-                                onclick="verDetalhesServico(${servico.id})" 
-                                title="Ver detalhes">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-success" 
-                                onclick="enviarProposta(${servico.id})" 
-                                title="Enviar Proposta">
-                            <i class="bi bi-send"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
+            // Create cells programmatically to prevent XSS
+            const cells = [];
+
+            // Title and description cell
+            const titleCell = document.createElement('td');
+            const titleStrong = document.createElement('strong');
+            titleStrong.textContent = servico.titulo;
+            titleCell.appendChild(titleStrong);
+
+            const br = document.createElement('br');
+            titleCell.appendChild(br);
+
+            const descSmall = document.createElement('small');
+            descSmall.className = 'text-muted';
+            const descText = servico.descricao.length > 50 ?
+                servico.descricao.substring(0, 50) + '...' :
+                servico.descricao;
+            descSmall.textContent = descText;
+            titleCell.appendChild(descSmall);
+            cells.push(titleCell);
+
+            // Category cell
+            const categoryCell = document.createElement('td');
+            const categorySpan = document.createElement('span');
+            categorySpan.className = 'badge bg-success';
+            categorySpan.textContent = servico.categoria;
+            categoryCell.appendChild(categorySpan);
+            cells.push(categoryCell);
+
+            // Client name cell
+            const clientCell = document.createElement('td');
+            const clientStrong = document.createElement('strong');
+            clientStrong.textContent = servico.cliente_nome;
+            clientCell.appendChild(clientStrong);
+            cells.push(clientCell);
+
+            // Budget cell
+            const budgetCell = document.createElement('td');
+            const budgetStrong = document.createElement('strong');
+            budgetStrong.className = 'text-success';
+            budgetStrong.textContent = orcamento;
+            budgetCell.appendChild(budgetStrong);
+            cells.push(budgetCell);
+
+            // Deadline cell
+            const deadlineCell = document.createElement('td');
+            const deadlineSmall = document.createElement('small');
+            deadlineSmall.textContent = prazo;
+            deadlineCell.appendChild(deadlineSmall);
+            cells.push(deadlineCell);
+
+            // Location cell
+            const locationCell = document.createElement('td');
+            const locationSmall = document.createElement('small');
+            locationSmall.textContent = servico.localizacao;
+            locationCell.appendChild(locationSmall);
+            cells.push(locationCell);
+
+            // Status cell
+            const statusCell = document.createElement('td');
+            const statusSpan = document.createElement('span');
+            const statusClass = getStatusClassServico(servico.status);
+            // Validate status class to prevent XSS
+            const validStatusClasses = ['bg-success', 'bg-secondary', 'bg-primary', 'bg-info', 'bg-danger'];
+            const safeStatusClass = validStatusClasses.includes(statusClass) ? statusClass : 'bg-secondary';
+            statusSpan.className = `badge ${safeStatusClass}`;
+            statusSpan.textContent = getStatusTextServico(servico.status);
+            statusCell.appendChild(statusSpan);
+            cells.push(statusCell);
+
+            // Date cell
+            const dateCell = document.createElement('td');
+            const dateSmall = document.createElement('small');
+            dateSmall.textContent = dataFormatada;
+            dateCell.appendChild(dateSmall);
+            cells.push(dateCell);
+
+            // Actions cell
+            const actionsCell = document.createElement('td');
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'btn-group';
+            btnGroup.setAttribute('role', 'group');
+
+            // View details button
+            const viewBtn = document.createElement('button');
+            viewBtn.type = 'button';
+            viewBtn.className = 'btn btn-sm btn-outline-primary';
+            viewBtn.title = 'Ver detalhes';
+            viewBtn.addEventListener('click', () => verDetalhesServico(servico.id));
+
+            const viewIcon = document.createElement('i');
+            viewIcon.className = 'bi bi-eye';
+            viewBtn.appendChild(viewIcon);
+            btnGroup.appendChild(viewBtn);
+
+            // Send proposal button
+            const proposalBtn = document.createElement('button');
+            proposalBtn.type = 'button';
+            proposalBtn.className = 'btn btn-sm btn-outline-success';
+            proposalBtn.title = 'Enviar Proposta';
+            proposalBtn.addEventListener('click', () => enviarProposta(servico.id));
+
+            const proposalIcon = document.createElement('i');
+            proposalIcon.className = 'bi bi-send';
+            proposalBtn.appendChild(proposalIcon);
+            btnGroup.appendChild(proposalBtn);
+
+            actionsCell.appendChild(btnGroup);
+            cells.push(actionsCell);
+
+            // Append all cells to the row
+            cells.forEach(cell => row.appendChild(cell));
 
             tableBody.appendChild(row);
         });
@@ -369,16 +437,16 @@ function enviarProposta(servicoId) {
             </div>
         </div>
     `;
-    
+
     // Remover modal anterior se existir
     const existingModal = document.getElementById('propostaModal');
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Adicionar modal ao body
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
+
     // Mostrar modal
     const modal = new bootstrap.Modal(document.getElementById('propostaModal'));
     modal.show();
@@ -391,61 +459,57 @@ async function processarEnvioProposta() {
         const valorProposta = document.getElementById('valorProposta').value;
         const prazoEstimado = document.getElementById('prazoEstimado').value;
         const mensagemProposta = document.getElementById('mensagemProposta').value;
-        
+
         // Validações
         if (!valorProposta || parseFloat(valorProposta) <= 0) {
             alert('Por favor, informe um valor válido para a proposta');
             return;
         }
-        
+
         if (!prazoEstimado.trim()) {
             alert('Por favor, informe o prazo estimado');
             return;
         }
-        
+
         if (!mensagemProposta.trim()) {
             alert('Por favor, descreva como você realizará o trabalho');
             return;
         }
-        
+
         const formData = new FormData();
         formData.append('request_id', requestId);
         formData.append('amount', valorProposta);
         formData.append('estimate', prazoEstimado);
         formData.append('message', mensagemProposta);
-        
+
         const response = await fetch('../php/prestador/criar-proposta.php', {
             method: 'POST',
             body: formData
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Fechar modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('propostaModal'));
             modal.hide();
-            
+
             // Mostrar mensagem de sucesso
             alert(`✅ Proposta enviada com sucesso para "${data.solicitacao_titulo}"!\n\nO cliente receberá sua proposta e poderá entrar em contato.`);
-            
+
             // Recarregar a lista de propostas
             carregarPropostas();
-            
+
         } else {
             alert('❌ Erro ao enviar proposta: ' + data.error);
         }
-        
+
     } catch (error) {
         console.error('Erro ao enviar proposta:', error);
         alert('❌ Erro ao enviar proposta. Verifique sua conexão e tente novamente.');
     }
 }
 
-function verDetalhesServico(servicoId) {
-    // Implementar modal para mostrar detalhes completos da solicitação
-    alert(`Ver detalhes da solicitação ${servicoId} - Em desenvolvimento`);
-}
 
 function verDetalhesProposta(proposalId) {
     // Implementar modal ou página para ver detalhes da proposta
