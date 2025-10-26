@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ServiçoFácil - Dashboard Cliente</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
     <link href="../assets/css/dashboard.css" rel="stylesheet" />
   </head>
   <body>
@@ -19,7 +25,10 @@
                 <span class="navbar-text me-3">
                   Bem-vindo(a), <span id="userName">Carregando...</span>
                 </span>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="logout()"
+                >
                   <i class="bi bi-box-arrow-right"></i> Sair
                 </button>
               </div>
@@ -27,10 +36,9 @@
           </nav>
         </div>
       </div>
-      
+
       <h1>Dashboard do Cliente</h1>
-      <div id="dashboardContent" style="display: none;">
-        
+      <div id="dashboardContent" style="display: none">
         <!-- Ações Rápidas -->
         <div class="row mb-4">
           <div class="col-12">
@@ -41,7 +49,10 @@
                   Ações Rápidas
                 </h5>
                 <div class="d-flex flex-wrap gap-2">
-                  <a href="./servico/nova-solicitacao.html" class="btn btn-success">
+                  <a
+                    href="./servico/nova-solicitacao.html"
+                    class="btn btn-success"
+                  >
                     <i class="bi bi-plus-circle-fill"></i>
                     Solicitar Serviço
                   </a>
@@ -55,36 +66,69 @@
           </div>
         </div>
 
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-journal-text"></i>
+              Minhas Solicitações de Serviço
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Categoria</th>
+                    <th>Prazo</th>
+                    <th>Orçamento</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="solicitacoesTable">
+                  <!-- Solicitações serão carregadas aqui via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Contratos (para avaliação) -->
+        <div class="mt-4">
           <div class="card">
             <div class="card-header">
               <h3>
-                <i class="bi bi-journal-text"></i>
-                Minhas Solicitações de Serviço
+                <i class="bi bi-file-earmark-text"></i>
+                Meus Contratos
               </h3>
+              <p class="mb-0 text-muted">
+                Acompanhe seus contratos e avalie os prestadores
+              </p>
             </div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th>Título</th>
+                      <th>Serviço</th>
+                      <th>Prestador</th>
                       <th>Categoria</th>
-                      <th>Prazo</th>
-                      <th>Orçamento</th>
                       <th>Status</th>
                       <th>Data</th>
-                      <th>Ações</th>
+                      <th>Avaliação</th>
                     </tr>
                   </thead>
-                  <tbody id="solicitacoesTable">
-                    <!-- Solicitações serão carregadas aqui via JavaScript -->
+                  <tbody id="contratosTable">
+                    <!-- Contratos serão carregados aqui via JavaScript -->
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Seção de Serviços Disponíveis (Visualização) -->
         <div class="mt-4">
           <div class="card">
@@ -93,7 +137,9 @@
                 <i class="bi bi-shop"></i>
                 Serviços Disponíveis
               </h3>
-              <p class="mb-0 text-muted">Explore serviços oferecidos pelos prestadores</p>
+              <p class="mb-0 text-muted">
+                Explore serviços oferecidos pelos prestadores
+              </p>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -116,7 +162,8 @@
             </div>
           </div>
         </div>
-      
+      </div>
+
       <!-- Botões de Ação Fixos -->
       <div class="mt-4 d-flex gap-2 flex-wrap">
         <a href="./servico/nova-solicitacao.html" class="btn btn-success">
@@ -131,7 +178,10 @@
     </div>
 
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
