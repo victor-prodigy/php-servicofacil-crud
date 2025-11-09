@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ServiçoFácil - Detalhes da Oportunidade</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <style>
+      .detail-card {
+        border: 1px solid #e0e0e0;
+        margin-bottom: 1.5rem;
+      }
+      .detail-card .card-header {
+        background: linear-gradient(135deg, #f88b45 0%, #ff9a5c 100%);
+        color: white;
+        font-weight: 600;
+      }
+      .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .info-item:last-child {
+        border-bottom: none;
+      }
+      .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+      }
+      .info-value {
+        color: #212529;
+      }
+      .proposal-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 2rem;
+      }
+      .photos-placeholder {
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        color: #6c757d;
+      }
+      .photos-placeholder i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <!-- Header -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="buscar-solicitacoes.html">
+            <i class="fas fa-arrow-left"></i> Voltar às Solicitações
+          </a>
+          <div class="d-flex">
+            <span class="navbar-text me-3">
+              <span id="userName">Carregando...</span>
+            </span>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              onclick="logout()"
+            >
+              <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-2 text-muted">Carregando detalhes da oportunidade...</p>
+      </div>
+
+      <!-- Opportunity Details -->
+      <div id="opportunityDetails" style="display: none;">
+        <!-- Title Card -->
+        <div class="card detail-card">
+          <div class="card-header">
+            <h2 class="mb-0" id="opportunityTitle">Carregando...</h2>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <span class="badge bg-secondary me-2" id="opportunityCategory"></span>
+                <span class="badge bg-info" id="opportunityLocation"></span>
+              </div>
+              <div class="col-md-6 text-md-end">
+                <small class="text-muted">
+                  <i class="fas fa-calendar"></i>
+                  Publicado em: <span id="opportunityDate"></span>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Card -->
+        <div class="card detail-card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-align-left"></i> Descrição</h5>
+          </div>
+          <div class="card-body">
+            <p id="opportunityDescription" class="mb-0"></p>
+          </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="card detail-card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informações Detalhadas</h5>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-map-marker-alt"></i> Endereço</div>
+              <div class="info-value" id="opportunityAddress"></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-city"></i> Cidade</div>
+              <div class="info-value" id="opportunityCity"></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-calendar-check"></i> Prazo Desejado</div>
+              <div class="info-value" id="opportunityDeadline"></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-dollar-sign"></i> Orçamento Máximo</div>
+              <div class="info-value" id="opportunityBudget"></div>
+            </div>
+            <div class="info-item" id="observationsItem" style="display: none;">
+              <div class="info-label"><i class="fas fa-sticky-note"></i> Observações</div>
+              <div class="info-value" id="opportunityObservations"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photos Section (Placeholder for future implementation) -->
+        <div class="card detail-card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-images"></i> Fotos</h5>
+          </div>
+          <div class="card-body">
+            <div class="photos-placeholder">
+              <i class="fas fa-image"></i>
+              <p class="mb-0">
+                Funcionalidade de fotos será implementada em breve
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client Information -->
+        <div class="card detail-card">
+          <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user"></i> Informações do Cliente</h5>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <div class="info-label">Nome</div>
+              <div class="info-value" id="clientName"></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Email</div>
+              <div class="info-value" id="clientEmail"></div>
+            </div>
+            <div class="info-item" id="clientPhoneItem" style="display: none;">
+              <div class="info-label">Telefone</div>
+              <div class="info-value" id="clientPhone"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proposal Section -->
+        <div class="proposal-section" id="proposalSection">
+          <h4 class="mb-4">
+            <i class="fas fa-paper-plane"></i> Enviar Proposta
+          </h4>
+          
+          <!-- Existing Proposal Alert -->
+          <div id="existingProposalAlert" class="alert alert-info" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <strong>Você já enviou uma proposta para esta oportunidade.</strong>
+            <div id="existingProposalDetails" class="mt-2"></div>
+          </div>
+
+          <form id="proposalForm">
+            <input type="hidden" id="requestId" />
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="valorProposta" class="form-label">
+                    Valor da Proposta (R$) *
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="valorProposta"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    placeholder="Ex: 150.00"
+                  />
+                  <div class="form-text">
+                    Informe o valor total que você cobrará pelo serviço
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="prazoEstimado" class="form-label">
+                    Prazo Estimado *
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="prazoEstimado"
+                    placeholder="Ex: 3 dias, 1 semana, 15 dias úteis"
+                    required
+                  />
+                  <div class="form-text">
+                    Informe quanto tempo você levará para concluir o serviço
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="mensagemProposta" class="form-label">
+                Descrição do Trabalho *
+              </label>
+              <textarea
+                class="form-control"
+                id="mensagemProposta"
+                rows="6"
+                required
+                placeholder="Descreva detalhadamente como você realizará o serviço, materiais que utilizará, metodologia, experiência relevante, etc..."
+              ></textarea>
+              <div class="form-text">
+                Seja detalhado! Uma proposta bem elaborada aumenta suas chances
+                de ser selecionado.
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-success btn-lg" id="submitProposalBtn">
+                <i class="fas fa-paper-plane"></i> Enviar Proposta
+              </button>
+              <a href="buscar-solicitacoes.html" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="alert alert-danger" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Erro ao carregar oportunidade</strong>
+        <p id="errorMessage" class="mb-0 mt-2"></p>
+        <a href="buscar-solicitacoes.html" class="btn btn-primary mt-3">
+          <i class="fas fa-arrow-left"></i> Voltar às Solicitações
+        </a>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../../assets/js/prestador-detalhe-oportunidade.js"></script>
+  </body>
+</html>
+
