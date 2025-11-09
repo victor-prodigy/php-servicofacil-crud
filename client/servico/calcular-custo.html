@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>ServiçoFácil - Calcular Custo do Serviço</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link href="../../assets/css/forms.css" rel="stylesheet" />
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <style>
+      /* Offcanvas Navbar Styles */
+      @media (max-width: 991.98px) {
+        .offcanvas-collapse {
+          position: fixed;
+          top: 56px;
+          bottom: 0;
+          left: -100%;
+          width: 100%;
+          padding-right: 1rem;
+          padding-left: 1rem;
+          overflow-y: auto;
+          visibility: hidden;
+          background-color: #343a40;
+          transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .offcanvas-collapse.open {
+          visibility: visible;
+          transform: translateX(100%);
+        }
+      }
+      .cost-estimate-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border: 2px solid #f78a45;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+      }
+      .cost-estimate-card.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .cost-breakdown {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+      }
+      .cost-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .cost-item:last-child {
+        border-bottom: none;
+        border-top: 2px solid #f78a45;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+      }
+      .cost-label {
+        color: #555;
+        font-weight: 500;
+      }
+      .cost-value {
+        color: #f78a45;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .cost-item:last-child .cost-value {
+        font-size: 1.5rem;
+        color: #e6782c;
+      }
+      .disclaimer {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: #856404;
+      }
+      .dimension-input-group {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+      }
+      .dimension-input {
+        flex: 1;
+      }
+      .text-primary {
+        color: #f78a45 !important;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #f78a45;
+        box-shadow: 0 0 0 0.25rem rgba(247, 138, 69, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <nav
+      class="navbar navbar-expand-lg fixed-top bg-white shadow-sm"
+      aria-label="Main navigation"
+    >
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold"
+          href="../../index.html"
+          style="color: #f88b45; font-size: 1.3rem"
+        >
+          ServiçoFácil
+        </a>
+        <button
+          class="navbar-toggler p-0 border-0"
+          type="button"
+          id="navbarSideCollapse"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="navbar-collapse offcanvas-collapse"
+          id="navbarsExampleDefault"
+        >
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="../cliente-dashboard.html">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="nova-solicitacao.html">
+                <i class="bi bi-plus-circle"></i> Nova Solicitação
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="calcular-custo.html"
+              >
+                <i class="bi bi-calculator"></i> Calcular Custo
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="buscar-prestadores.html">
+                <i class="bi bi-search"></i> Buscar Prestadores
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="userNameNav">
+                <i class="bi bi-person-circle"></i>
+                <span id="userName">Carregando...</span>
+              </a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <button class="btn btn-outline-danger" onclick="logout()">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+          <!-- Form Card -->
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="mb-4">
+                <i class="fas fa-calculator text-primary me-2"></i>Calcular
+                Custo do Serviço
+              </h2>
+              <p class="text-muted mb-4">
+                Preencha os dados abaixo para obter uma estimativa automática do
+                custo do serviço, dividida entre materiais e mão de obra.
+              </p>
+
+              <form id="calcularCustoForm">
+                <!-- Tipo de Serviço -->
+                <div class="mb-4">
+                  <label for="tipo_servico" class="form-label fw-semibold">
+                    <i class="fas fa-list text-primary me-2"></i>Tipo de Serviço
+                  </label>
+                  <select
+                    class="form-select form-select-lg"
+                    id="tipo_servico"
+                    name="tipo_servico"
+                    required
+                  >
+                    <option value="">Selecione o tipo de serviço</option>
+                    <option value="Encanamento">🔧 Encanamento</option>
+                    <option value="Elétrica">⚡ Elétrica</option>
+                    <option value="Pintura">🎨 Pintura</option>
+                    <option value="Limpeza">🧽 Limpeza</option>
+                    <option value="Jardinagem">🌱 Jardinagem</option>
+                    <option value="Marcenaria">🪚 Marcenaria</option>
+                    <option value="Pedreiro">🧱 Pedreiro</option>
+                    <option value="Mecânica">🔩 Mecânica</option>
+                    <option value="Informática">💻 Informática</option>
+                    <option value="Outros">📋 Outros</option>
+                  </select>
+                  <div class="form-text">
+                    Selecione a categoria do serviço desejado
+                  </div>
+                </div>
+
+                <!-- Dimensões -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-ruler-combined text-primary me-2"></i
+                    >Dimensões
+                  </label>
+                  <div class="dimension-input-group">
+                    <div class="dimension-input">
+                      <label for="largura" class="form-label"
+                        >Largura (m)</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="largura"
+                        name="largura"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    <div class="dimension-input">
+                      <label for="comprimento" class="form-label"
+                        >Comprimento (m)</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="comprimento"
+                        name="comprimento"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required
+                      />
+                    </div>
+                    <div class="dimension-input">
+                      <label for="altura" class="form-label">Altura (m)</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="altura"
+                        name="altura"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-text">
+                    Informe as dimensões do local ou objeto do serviço
+                  </div>
+                </div>
+
+                <!-- Especificações Adicionais -->
+                <div class="mb-4">
+                  <label for="especificacoes" class="form-label fw-semibold">
+                    <i class="fas fa-info-circle text-primary me-2"></i
+                    >Especificações Adicionais
+                  </label>
+                  <select
+                    class="form-select"
+                    id="especificacoes"
+                    name="especificacoes"
+                  >
+                    <option value="basico">Básico</option>
+                    <option value="intermediario">Intermediário</option>
+                    <option value="avancado">Avançado</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                  <div class="form-text">
+                    Nível de complexidade ou qualidade desejada
+                  </div>
+                </div>
+
+                <!-- Área de Resultado -->
+                <div
+                  id="cost-estimate-area"
+                  class="cost-estimate-card"
+                  style="display: none"
+                >
+                  <h4 class="mb-3">
+                    <i class="fas fa-chart-line text-primary me-2"></i
+                    >Estimativa de Custo
+                  </h4>
+
+                  <div class="cost-breakdown">
+                    <div class="cost-item">
+                      <span class="cost-label">
+                        <i class="fas fa-tools me-2"></i>Materiais
+                      </span>
+                      <span class="cost-value" id="custo-materiais"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                    <div class="cost-item">
+                      <span class="cost-label">
+                        <i class="fas fa-user-hard-hat me-2"></i>Mão de Obra
+                      </span>
+                      <span class="cost-value" id="custo-mao-obra"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                    <div class="cost-item">
+                      <span class="cost-label">Total Estimado</span>
+                      <span class="cost-value" id="custo-total">R$ 0,00</span>
+                    </div>
+                  </div>
+
+                  <div class="disclaimer">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Atenção:</strong> Esta é apenas uma estimativa
+                    automática baseada nos dados informados. Os valores reais
+                    podem variar conforme avaliação presencial, condições
+                    específicas do local, materiais escolhidos e outras
+                    variáveis. As propostas dos prestadores podem apresentar
+                    valores diferentes desta estimativa.
+                  </div>
+                </div>
+
+                <!-- Alert area -->
+                <div id="alert-area" class="mb-3"></div>
+
+                <!-- Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                  <a
+                    href="../cliente-dashboard.html"
+                    class="btn btn-outline-secondary btn-lg me-md-2"
+                  >
+                    <i class="fas fa-times me-2"></i>Cancelar
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Offcanvas Navbar Script -->
+    <script>
+      (function () {
+        "use strict";
+        document
+          .querySelector("#navbarSideCollapse")
+          .addEventListener("click", function () {
+            document
+              .querySelector(".offcanvas-collapse")
+              .classList.toggle("open");
+          });
+      })();
+    </script>
+    <!-- Logout and User Name Scripts -->
+    <script>
+      function logout() {
+        if (confirm("Deseja realmente sair?")) {
+          window.location.href = "../../php/logout.php";
+        }
+      }
+
+      // Carregar nome do usuário se estiver autenticado
+      document.addEventListener("DOMContentLoaded", async function () {
+        const userNameElement = document.getElementById("userName");
+        if (userNameElement) {
+          try {
+            const response = await fetch(
+              "../../php/cliente/cliente-dashboard.php"
+            );
+            const data = await response.json();
+            if (data.authenticated && data.nome) {
+              userNameElement.textContent = data.nome;
+            }
+          } catch (error) {
+            console.log("Usuário não autenticado ou erro ao carregar nome");
+          }
+        }
+      });
+    </script>
+    <script src="../../assets/js/calcular-custo.js"></script>
+  </body>
+</html>
+
