@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avaliar Prestador - ServiçoFácil</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link href="../../assets/css/forms.css" rel="stylesheet" />
+    <style>
+      .star-rating {
+        display: flex;
+        gap: 10px;
+        font-size: 2rem;
+      }
+      .star {
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s;
+        border-radius: 4px;
+        padding: 2px;
+      }
+      .star:hover,
+      .star.active {
+        color: #ffc107;
+      }
+      .star:focus {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+        background-color: rgba(13, 110, 253, 0.1);
+      }
+      .star:focus.active {
+        background-color: rgba(255, 193, 7, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+              <h3><i class="bi bi-star-fill"></i> Avaliar Prestador</h3>
+            </div>
+            <div class="card-body">
+              <div id="contratoInfo" class="mb-4">
+                <!-- Informações do contrato serão carregadas aqui -->
+              </div>
+
+              <form id="formAvaliacao">
+                <div class="mb-4">
+                  <label id="rating-label" class="form-label fw-bold"
+                    >Nota do Serviço *</label
+                  >
+                  <div
+                    class="star-rating"
+                    id="starRating"
+                    role="radiogroup"
+                    aria-labelledby="rating-label"
+                    aria-describedby="rating-error"
+                  >
+                    <i
+                      class="bi bi-star-fill star"
+                      data-rating="1"
+                      role="radio"
+                      tabindex="0"
+                      aria-label="1 de 5"
+                      aria-checked="false"
+                    ></i>
+                    <i
+                      class="bi bi-star-fill star"
+                      data-rating="2"
+                      role="radio"
+                      tabindex="-1"
+                      aria-label="2 de 5"
+                      aria-checked="false"
+                    ></i>
+                    <i
+                      class="bi bi-star-fill star"
+                      data-rating="3"
+                      role="radio"
+                      tabindex="-1"
+                      aria-label="3 de 5"
+                      aria-checked="false"
+                    ></i>
+                    <i
+                      class="bi bi-star-fill star"
+                      data-rating="4"
+                      role="radio"
+                      tabindex="-1"
+                      aria-label="4 de 5"
+                      aria-checked="false"
+                    ></i>
+                    <i
+                      class="bi bi-star-fill star"
+                      data-rating="5"
+                      role="radio"
+                      tabindex="-1"
+                      aria-label="5 de 5"
+                      aria-checked="false"
+                    ></i>
+                  </div>
+                  <div
+                    id="rating-error"
+                    class="invalid-feedback"
+                    style="display: none"
+                  >
+                    Selecione uma nota
+                  </div>
+                  <input type="hidden" id="rating" name="rating" required />
+                </div>
+
+                <div class="mb-3">
+                  <label for="comment" class="form-label"
+                    >Comentário (opcional)</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="comment"
+                    name="comment"
+                    rows="4"
+                    placeholder="Compartilhe sua experiência com este prestador..."
+                    maxlength="500"
+                  ></textarea>
+                  <div class="form-text">Máximo 500 caracteres</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Enviar Avaliação
+                  </button>
+                  <a href="../cliente-dashboard.html" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/avaliar-prestador.js"></script>
+  </body>
+</html>
+
