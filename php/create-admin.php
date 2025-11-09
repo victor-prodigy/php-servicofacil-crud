@@ -77,8 +77,8 @@ try {
             echo "   Telefone: $admin_phone\n";
             echo "   Senha: $admin_password\n";
             echo "\n🔗 URLs de acesso:\n";
-            echo "   Login: http://localhost/php-servicofacil-crud/client/login/admin-signin.html\n";
-            echo "   Dashboard: http://localhost/php-servicofacil-crud/client/administrador-dashboard.html\n";
+            echo "   Login: http://localhost/php-servicofacil-crud-incompleto/client/login/admin-signin.html\n";
+            echo "   Dashboard: http://localhost/php-servicofacil-crud-incompleto/client/administrador-dashboard.html\n";
         } else {
             echo "❌ Erro ao criar administrador!\n";
         }

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ServiçoFácil - Dashboard Cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet" />
+    <link href="../assets/css/dashboard.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+      .search-section {
+        background: #1c1c1e;
+        border-radius: 1rem;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+      }
+
+      .filter-btn-group .btn {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Estilos dos inputs e botões - Bootstrap Checkout style */
+      .form-control {
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+      }
+
+      .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+
+      .btn-outline-light {
+        color: #f8f9fa;
+        border-color: #f8f9fa;
+      }
+
+      .btn-outline-light:hover,
+      .btn-outline-light.active {
+        color: #000;
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+      }
+
+      .btn-light {
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+        color: #000;
+      }
+
+      .btn-light:hover {
+        background-color: #e9ecef;
+        border-color: #e9ecef;
+      }
+
+      /* Offcanvas Navbar Styles */
+      .navbar-brand {
+        font-weight: 700;
+      }
+
+      .navbar.fixed-top {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+      }
+
+      body {
+        padding-top: 56px;
+      }
+
+      @media (max-width: 991.98px) {
+        .offcanvas-collapse {
+          position: fixed;
+          top: 56px;
+          bottom: 0;
+          left: -100%;
+          width: 100%;
+          padding-right: 1rem;
+          padding-left: 1rem;
+          overflow-y: auto;
+          visibility: hidden;
+          background-color: #343a40;
+          transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .offcanvas-collapse.open {
+          visibility: visible;
+          transform: translateX(100%);
+        }
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        color: rgba(255, 255, 255, 0.75);
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm" aria-label="Main navigation">
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold"
+          href="../../php-servicofacil-crud-incompleto/index.html"
+          style="color: #f88b45; font-size: 1.3rem"
+        >
+          ServiçoFácil
+        </a>
+        <button class="navbar-toggler p-0 border-0" type="button" id="navbarSideCollapse" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="cliente-dashboard.html">
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./servico/nova-solicitacao.html">
+                <i class="bi bi-plus-circle"></i> Nova Solicitação
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./servico/calcular-custo.html">
+                <i class="bi bi-calculator"></i> Calcular Custo
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./servico/buscar-prestadores.html">
+                <i class="bi bi-search"></i> Buscar Prestadores
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="userNameNav">
+                <i class="bi bi-person-circle"></i> <span id="userName">Carregando...</span>
+              </a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <button class="btn btn-outline-danger" onclick="logout()">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <div id="dashboardContent" style="display: none;">
+        <!-- Botão para ir para página buscar-prestadores.html -->
+        <div class="mb-3">
+          <a href="./servico/buscar-prestadores.html" class="btn btn-primary btn-lg">
+            <i class="bi bi-search"></i> Buscar Prestadores
+          </a>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-journal-text"></i>
+              Minhas Solicitações de Serviço
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Categoria</th>
+                    <th>Prazo</th>
+                    <th>Orçamento</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="solicitacoesTable">
+                  <!-- Solicitações serão carregadas aqui via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Contratos (para avaliação) -->
+        <div class="mt-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-file-earmark-text"></i>
+                Meus Contratos
+              </h3>
+              <p class="mb-0 text-muted">
+                Acompanhe seus contratos e avalie os prestadores
+              </p>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Serviço</th>
+                      <th>Prestador</th>
+                      <th>Categoria</th>
+                      <th>Status</th>
+                      <th>Data</th>
+                      <th>Avaliação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="contratosTable">
+                    <!-- Contratos serão carregados aqui via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Serviços Disponíveis (Visualização) -->
+        <div class="mt-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-shop"></i>
+                Serviços Disponíveis
+              </h3>
+              <p class="mb-0 text-muted">
+                Explore serviços oferecidos pelos prestadores
+              </p>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Categoria</th>
+                      <th>Orçamento</th>
+                      <th>Status</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="servicosTable">
+                    <!-- Serviços serão carregados aqui via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      <div class="mt-4">
+        <a href="./servico/nova-solicitacao.html" class="btn btn-success btn-lg">
+          <i class="bi bi-plus-circle"></i>
+          Nova Solicitação de Serviço
+        </a>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Offcanvas Navbar Script -->
+    <script>
+      (function () {
+        'use strict'
+        document.querySelector('#navbarSideCollapse').addEventListener('click', function () {
+          document.querySelector('.offcanvas-collapse').classList.toggle('open')
+        })
+      })()
+    </script>
+    <!-- Custom JS -->
+    <script src="../assets/js/cliente-dashboard.js"></script>
+    <script src="../assets/js/prestador-busca.js"></script>
+  </body>
+</html>
