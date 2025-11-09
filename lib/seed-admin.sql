@@ -68,8 +68,8 @@ Senha: admin123
 
 URL DE ACESSO:
 ==============
-Login: http://localhost/php-servicofacil-crud/client/login/admin-signin.html
-Dashboard: http://localhost/php-servicofacil-crud/client/administrador-dashboard.html
+Login: http://localhost/php-servicofacil-crud-incompleto/client/login/admin-signin.html
+Dashboard: http://localhost/php-servicofacil-crud-incompleto/client/administrador-dashboard.html
 
 FUNCIONALIDADES:
 ================

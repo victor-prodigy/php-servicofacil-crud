@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ServiçoFácil - Dashboard Prestador</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link href="../assets/css/dashboard.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <style>
+      /* Offcanvas Navbar Styles */
+      .navbar-brand {
+        font-weight: 700;
+      }
+
+      .navbar.fixed-top {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+      }
+
+      body {
+        padding-top: 56px;
+      }
+
+      @media (max-width: 991.98px) {
+        .offcanvas-collapse {
+          position: fixed;
+          top: 56px;
+          bottom: 0;
+          left: -100%;
+          width: 100%;
+          padding-right: 1rem;
+          padding-left: 1rem;
+          overflow-y: auto;
+          visibility: hidden;
+          background-color: #343a40;
+          transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .offcanvas-collapse.open {
+          visibility: visible;
+          transform: translateX(100%);
+        }
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        color: rgba(255, 255, 255, 0.75);
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <nav
+      class="navbar navbar-expand-lg fixed-top bg-white shadow-sm"
+      aria-label="Main navigation"
+    >
+      <div class="container-fluid">
+        <a
+          class="navbar-brand fw-bold"
+          href="../../php-servicofacil-crud-incompleto/index.html"
+          style="color: #f88b45; font-size: 1.3rem"
+        >
+          ServiçoFácil
+        </a>
+        <button
+          class="navbar-toggler p-0 border-0"
+          type="button"
+          id="navbarSideCollapse"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="navbar-collapse offcanvas-collapse"
+          id="navbarsExampleDefault"
+        >
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="prestador-dashboard.html"
+              >
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./prestador/buscar-solicitacoes.html">
+                <i class="bi bi-search"></i> Buscar Solicitações
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./prestador/postar-servico.html">
+                <i class="bi bi-plus-circle"></i> Postar Serviço
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="./prestador/painel-servicos-publicados.html"
+              >
+                <i class="bi bi-journal-text"></i> Meus Serviços
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="#"
+                onclick="carregarPropostas(); return false;"
+              >
+                <i class="bi bi-send-fill"></i> Minhas Propostas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="./prestador/entrar-contato-cliente.html"
+              >
+                <i class="bi bi-chat-dots"></i> Entrar em Contato
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="userNameNav">
+                <i class="bi bi-person-circle"></i>
+                <span id="userName">Carregando...</span>
+              </a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <button class="btn btn-outline-danger" onclick="logout()">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <div id="dashboardContent" style="display: none">
+        <!-- Seção de Propostas Enviadas -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="bi bi-send"></i>
+                  Minhas Propostas Enviadas
+                </h3>
+                <p class="mb-0 text-muted">
+                  Acompanhe suas propostas enviadas para solicitações de
+                  clientes
+                </p>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Solicitação</th>
+                        <th>Cliente</th>
+                        <th>Valor Proposto</th>
+                        <th>Prazo Estimado</th>
+                        <th>Status</th>
+                        <th>Data da Proposta</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody id="propostasTable">
+                      <!-- Propostas serão carregadas aqui via JavaScript -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Solicitações de Clientes (Visualização) -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3>
+                  <i class="bi bi-journal-text"></i>
+                  Serviços Postados por Clientes
+                </h3>
+                <p class="mb-0 text-muted">
+                  Visualize serviços postados pelos clientes
+                </p>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Título</th>
+                        <th>Categoria</th>
+                        <th>Cliente</th>
+                        <th>Orçamento</th>
+                        <th>Prazo</th>
+                        <th>Localização</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody id="servicosClientesTable">
+                      <!-- Serviços dos clientes serão carregados aqui via JavaScript -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de Ação Fixos -->
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <a href="prestador/buscar-solicitacoes.html" class="btn btn-primary">
+          <i class="bi bi-search"></i>
+          Buscar Solicitações de Serviços
+        </a>
+        <a href="prestador/postar-servico.html" class="btn btn-success">
+          <i class="bi bi-plus-circle"></i>
+          Postar Novo Serviço
+        </a>
+        <a
+          href="prestador/painel-servicos-publicados.html"
+          class="btn btn-info text-white"
+        >
+          <i class="bi bi-journal-text"></i>
+          Painel de Serviços Publicados
+        </a>
+        <button onclick="carregarPropostas()" class="btn btn-secondary">
+          <i class="bi bi-send-fill"></i>
+          Ver Minhas Propostas
+        </button>
+        <a
+          href="prestador/entrar-contato-cliente.html"
+          class="btn btn-primary-custom"
+        >
+          <i class="bi bi-chat-dots"></i>
+          Entrar em Contato com Cliente
+        </a>
+        <button onclick="carregarServicosClientes()" class="btn btn-warning">
+          <i class="bi bi-arrow-clockwise"></i>
+          Atualizar Serviços
+        </button>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Offcanvas Navbar Script -->
+    <script>
+      (function () {
+        "use strict";
+        document
+          .querySelector("#navbarSideCollapse")
+          .addEventListener("click", function () {
+            document
+              .querySelector(".offcanvas-collapse")
+              .classList.toggle("open");
+          });
+      })();
+    </script>
+    <!-- Custom JS -->
+    <script src="../assets/js/prestador-dashboard.js"></script>
+  </body>
+</html>
