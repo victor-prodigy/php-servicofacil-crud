@@ -26,7 +26,7 @@ function enviarResposta($success, $message, $data = [])
 
 try {
     // 🔐 Verificar se usuário está logado como prestador
-    if (!isset($_SESSION['prestador_id']) || $_SESSION['usuario_tipo'] !== 'prestador') {
+    if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'prestador') {
         enviarResposta(false, 'Acesso negado. Faça login como prestador.');
     }
 
@@ -40,7 +40,24 @@ try {
         enviarResposta(false, 'ID da oportunidade inválido.');
     }
 
-    $prestadorId = $_SESSION['prestador_id'];
+    $prestadorId = $_SESSION['prestador_id'] ?? null;
+    
+    // Se prestador_id não estiver na sessão, tentar buscar pelo user_id
+    if (empty($prestadorId) && isset($_SESSION['usuario_id'])) {
+        $sql_buscar = "SELECT service_provider_id FROM service_provider WHERE user_id = ?";
+        $stmt_buscar = $pdo->prepare($sql_buscar);
+        $stmt_buscar->execute([$_SESSION['usuario_id']]);
+        $prestador_buscado = $stmt_buscar->fetch();
+        
+        if ($prestador_buscado) {
+            $prestadorId = $prestador_buscado['service_provider_id'];
+            $_SESSION['prestador_id'] = $prestadorId; // Atualizar sessão
+        }
+    }
+    
+    if (empty($prestadorId)) {
+        enviarResposta(false, 'Prestador não encontrado. Faça login novamente.');
+    }
 
     // 🔍 Buscar detalhes da oportunidade
     $sql = "SELECT 
