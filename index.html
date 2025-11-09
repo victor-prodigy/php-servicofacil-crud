@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="./assets/css/index.css" />
+    <style>
+      /* Offcanvas Navbar Styles */
+      .navbar-brand {
+        font-weight: 700;
+      }
+
+      .navbar.fixed-top {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+      }
+
+      body {
+        padding-top: 56px;
+      }
+
+      @media (max-width: 991.98px) {
+        .offcanvas-collapse {
+          position: fixed;
+          top: 56px;
+          bottom: 0;
+          left: -100%;
+          width: 100%;
+          padding-right: 1rem;
+          padding-left: 1rem;
+          overflow-y: auto;
+          visibility: hidden;
+          background-color: #343a40;
+          transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .offcanvas-collapse.open {
+          visibility: visible;
+          transform: translateX(100%);
+        }
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        color: rgba(255, 255, 255, 0.75);
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="element-default">
+      <div class="link">
+        <div class="text-wrapper">___</div>
+      </div>
+      <div class="body-paints"></div>
+      <div class="container">
+        <footer class="footer">
+          <div class="div">
+            <div class="heading-for-clients">For Clients</div>
+            <div class="list">
+              <div class="item-link">
+                <div class="text-wrapper-2">How to hire</div>
+              </div>
+              <div class="div-wrapper">
+                <div class="text-wrapper-3">Talent Marketplace</div>
+              </div>
+              <div class="item-link-2">
+                <div class="text-wrapper-4">Project Catalog</div>
+              </div>
+              <div class="item-link-3">
+                <div class="text-wrapper-5">Hire an agency</div>
+              </div>
+              <div class="item-link-4">
+                <div class="text-wrapper-6">Enterprise</div>
+              </div>
+              <div class="item-link-5">
+                <div class="text-wrapper-7">Business Plus</div>
+              </div>
+              <div class="item-link-6">
+                <div class="text-wrapper-8">Any Hire</div>
+              </div>
+              <div class="item-link-7">
+                <div class="text-wrapper-9">Contract-to-hire</div>
+              </div>
+              <div class="item-link-8">
+                <div class="text-wrapper-10">Direct Contracts</div>
+              </div>
+              <div class="item-link-9">
+                <div class="text-wrapper-11">Hire worldwide</div>
+              </div>
+              <div class="item-link-10">
+                <div class="text-wrapper-12">Hire in the USA</div>
+              </div>
+            </div>
+            <div class="heading-for-talent">For Talent</div>
+            <div class="list-2">
+              <div class="item-link-11">
+                <div class="text-wrapper-13">How to find work</div>
+              </div>
+              <div class="item-link-8">
+                <div class="text-wrapper-10">Direct Contracts</div>
+              </div>
+              <div class="item-link-12">
+                <div class="text-wrapper-14">Find freelance jobs worldwide</div>
+              </div>
+              <div class="item-link-13">
+                <p class="p">Find freelance jobs in the USA</p>
+              </div>
+              <div class="item-link-14">
+                <div class="text-wrapper-15">Win work with ads</div>
+              </div>
+              <div class="item-link-15">
+                <p class="text-wrapper-16">
+                  Exclusive resources with Freelancer Plus
+                </p>
+              </div>
+            </div>
+            <div class="heading-resources">Resources</div>
+            <div class="list-3">
+              <div class="help-support-wrapper">
+                <div class="help-support">Help &amp; support</div>
+              </div>
+              <div class="item-link-16">
+                <div class="text-wrapper-17">Success stories</div>
+              </div>
+              <div class="item-link-17">
+                <div class="text-wrapper-18">ServicoFacil reviews</div>
+              </div>
+              <div class="item-link-18">
+                <div class="text-wrapper-19">Resources</div>
+              </div>
+              <div class="item-link-19">
+                <div class="text-wrapper-20">Blog</div>
+              </div>
+              <div class="item-link-20">
+                <div class="text-wrapper-21">Affiliate programme</div>
+              </div>
+              <div class="item-link-21">
+                <div class="text-wrapper-22">Free Business Tools</div>
+              </div>
+              <div class="item-link-22">
+                <div class="text-wrapper-23">Release notes</div>
+              </div>
+            </div>
+            <div class="heading-company">Company</div>
+            <div class="list-4">
+              <div class="item-link-23">
+                <div class="text-wrapper-24">About us</div>
+              </div>
+              <div class="item-link-24">
+                <div class="text-wrapper-25">Leadership</div>
+              </div>
+              <div class="item-link-25">
+                <div class="text-wrapper-26">Investor relations</div>
+              </div>
+              <div class="item-link-26">
+                <div class="text-wrapper-27">Careers</div>
+              </div>
+              <div class="item-link-27">
+                <div class="text-wrapper-28">Our impact</div>
+              </div>
+              <div class="item-link-28">
+                <div class="text-wrapper-29">Press</div>
+              </div>
+              <div class="item-link-29">
+                <div class="text-wrapper-30">Contact us</div>
+              </div>
+              <div class="item-link-30">
+                <div class="text-wrapper-31">Partners</div>
+              </div>
+              <div class="trust-safety-wrapper">
+                <div class="trust-safety">Trust, safety &amp; security</div>
+              </div>
+              <div class="item-link-31">
+                <div class="text-wrapper-32">Modern slavery statement</div>
+              </div>
+            </div>
+            <div class="horizontal-border">
+              <div class="heading-follow-us">Follow us</div>
+              <img class="img" src="img/list.svg" />
+              <div class="heading-mobile-app">Mobile app</div>
+              <img class="list-5" src="img/list-2.svg" />
+            </div>
+            <p class="text-wrapper-33">
+              © 2015 - 2025 ServicoFacil® Global Inc.
+            </p>
+            <div class="list-6">
+              <div class="item-link-32">
+                <div class="text-wrapper-34">Terms of Service</div>
+              </div>
+              <div class="item-link-33">
+                <div class="text-wrapper-35">Privacy Policy</div>
+              </div>
+              <div class="item-link-34">
+                <div class="text-wrapper-36">CA Notice at Collection</div>
+              </div>
+              <div class="item-link-35">
+                <div class="text-wrapper-37">Cookie Settings</div>
+              </div>
+              <div class="item-link-36">
+                <div class="text-wrapper-38">Accessibility</div>
+              </div>
+            </div>
+          </div>
+        </footer>
+        <div class="main">
+          <img class="section-section" src="img/section-section.png" />
+          <div class="section">
+            <div class="section-2">
+              <div class="container-2">
+                <div class="textarea">
+                  <p class="text-wrapper-39">
+                    To start, describe what you need done.
+                  </p>
+                </div>
+                <button class="button">
+                  <div class="background-blur"></div>
+                  <div class="text-wrapper-40">Next</div>
+                  <div class="vector-wrapper">
+                    <img class="vector" src="img/image.svg" />
+                  </div>
+                </button>
+                <div class="heading-get">
+                  Get insights into<br />freelancer pricing
+                </div>
+                <p class="text-wrapper-41">
+                  We'll calculate the average cost for freelancers with the
+                  skills you need.
+                </p>
+              </div>
+              <img class="SVG" src="img/SVG.svg" />
+            </div>
+            <div class="section-3">
+              <p class="heading-clients">Clients only pay after hiring</p>
+              <div class="background-border">
+                <div class="heading">MARKETPLACE</div>
+                <div class="text-wrapper-42">5% fee after hiring</div>
+                <p class="for-starting-out-on">
+                  For starting out on our global freelancer<br />marketplace
+                </p>
+                <div class="list-7">
+                  <div class="item">
+                    <div class="img-wrapper">
+                      <img class="vector-2" src="img/vector-7.svg" />
+                    </div>
+                    <p class="free-to-post-jobs-on">
+                      Free to post jobs on our global freelance<br />marketplace
+                    </p>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-3.svg" />
+                    </div>
+                    <div class="text-wrapper-43">AI-powered features</div>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-5.svg" />
+                    </div>
+                    <p class="text-wrapper-44">
+                      Collaboration and project tracking tools
+                    </p>
+                  </div>
+                </div>
+                <a href="client/pagamento.html" class="link-2">
+                  <div class="text-wrapper-45">Get started for free</div>
+                </a>
+              </div>
+              <div class="background-border-2">
+                <div class="heading-BUSINESS">BUSINESS PLUS</div>
+                <div class="text-wrapper-46">10% fee after hiring</div>
+                <div class="background">
+                  <div class="text-wrapper-47">Popular</div>
+                </div>
+                <p class="for-growing">
+                  For growing businesses with premium<br />features and support
+                </p>
+                <div class="list-7">
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-10.svg" />
+                    </div>
+                    <p class="text-wrapper-48">
+                      Access to pre-screened top 1% of talent
+                    </p>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-22.svg" />
+                    </div>
+                    <div class="text-wrapper-49">
+                      Premium customer support 24/7
+                    </div>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector.svg" />
+                    </div>
+                    <p class="text-wrapper-50">60 invites per job post</p>
+                  </div>
+                </div>
+                <a href="client/pagamento.html" class="link-3">
+                  <div class="text-wrapper-51">Get started for free</div>
+                </a>
+                <img class="mask-group" src="img/mask-group.svg" />
+              </div>
+              <div class="background-border-3">
+                <div class="heading-ENTERPRISE">ENTERPRISE</div>
+                <div class="text-wrapper-52">Contact sales</div>
+                <p class="for-scaling">
+                  For scaling comprehensive solutions to<br />the entire
+                  organization
+                </p>
+                <div class="list-8">
+                  <div class="item">
+                    <div class="img-wrapper">
+                      <img class="vector-2" src="img/vector-19.svg" />
+                    </div>
+                    <div class="dedicated-account">
+                      Dedicated account and program<br />management
+                    </div>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-12.svg" />
+                    </div>
+                    <div class="text-wrapper-53">SSO and integrations</div>
+                  </div>
+                  <div class="item-2">
+                    <div class="img-2">
+                      <img class="vector-2" src="img/vector-20.svg" />
+                    </div>
+                    <div class="text-wrapper-54">Unlimited invites per job</div>
+                  </div>
+                </div>
+                <div class="link-2">
+                  <div class="text-wrapper-55">Contact sales</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="header-wrapper">
+        <!-- Header -->
+        <nav
+          class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top w-100"
+          aria-label="Main navigation"
+        >
+          <div class="container-fluid">
+            <a
+              class="navbar-brand fw-bold"
+              href="#"
+              style="color: #f88b45; font-size: 1.3rem"
+            >
+              ServiçoFácil
+            </a>
+
+            <button
+              class="navbar-toggler p-0 border-0"
+              type="button"
+              id="navbarSideCollapse"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse offcanvas-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                  <a
+                    class="nav-link dropdown-toggle fw-semibold"
+                    href="#"
+                    id="findTalentDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Find talent
+                  </a>
+                  <ul
+                    class="dropdown-menu"
+                    aria-labelledby="findTalentDropdown"
+                  >
+                    <li>
+                      <a class="dropdown-item" href="#">Browse Talents</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#">Post a Job</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a
+                    class="nav-link dropdown-toggle fw-semibold"
+                    href="#"
+                    id="findWorkDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Find work
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="findWorkDropdown">
+                    <li><a class="dropdown-item" href="#">Browse Jobs</a></li>
+                    <li>
+                      <a class="dropdown-item" href="#">My Applications</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a
+                    class="nav-link dropdown-toggle fw-semibold"
+                    href="#"
+                    id="servicosDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <i class="fas fa-tools me-1"></i>
+                    Serviços
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="servicosDropdown">
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="client/servico/buscar-prestadores.html"
+                      >
+                        <i class="fas fa-search me-2"></i>
+                        Buscar Prestadores
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="client/servico/nova-solicitacao.html"
+                      >
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Solicitar Serviço
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="client/servico/novo-servico.html"
+                      >
+                        <i class="fas fa-megaphone me-2"></i>
+                        Publicar Serviço
+                      </a>
+                    </li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="client/cliente-dashboard.html"
+                      >
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Dashboard
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a
+                    class="nav-link dropdown-toggle fw-semibold"
+                    href="#"
+                    id="whyUpworkDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Why ServiçoFácil
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="whyUpworkDropdown">
+                    <li>
+                      <a class="dropdown-item" href="#">Success Stories</a>
+                    </li>
+                    <li><a class="dropdown-item" href="#">Reviews</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link fw-semibold" href="#">Pricing</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link fw-semibold" href="#">
+                    <span class="badge me-1" style="background-color: #f88b45"
+                      >NEW</span
+                    >
+                    For enterprise
+                  </a>
+                </li>
+              </ul>
+
+              <div class="d-flex gap-2 flex-wrap">
+                <a
+                  href="client/registro/index.html"
+                  class="btn btn-outline-primary"
+                  style="border-color: #f88b45; color: #f88b45"
+                >
+                  Sign up
+                </a>
+                <a
+                  href="client/login/index.html"
+                  class="btn btn-primary"
+                  style="background-color: #f88b45; border-color: #f88b45"
+                >
+                  Log in
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Offcanvas Navbar Script -->
+    <script>
+      (function () {
+        "use strict";
+        document
+          .querySelector("#navbarSideCollapse")
+          .addEventListener("click", function () {
+            document
+              .querySelector(".offcanvas-collapse")
+              .classList.toggle("open");
+          });
+      })();
+    </script>
+  </body>
+</html>

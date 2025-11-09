@@ -1,0 +1,24 @@
+/* Estilos para formulários */
+.form-field {
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+.form-field.hidden {
+  opacity: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.form-check-input:checked {
+  background-color: #f78a45;
+  border-color: #f78a45;
+}
+.form-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #555;
+}
+.form-text {
+  font-size: 0.75rem;
+}
