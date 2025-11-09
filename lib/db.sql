@@ -203,37 +203,6 @@ CREATE TABLE
         CONSTRAINT `fk_chat_service_provider` FOREIGN KEY (`service_provider_id`) REFERENCES `service_provider` (`service_provider_id`) ON DELETE CASCADE
     );
 
--- ============================================
--- TABELA: PAGAMENTOS (Pagamentos - Tabela Legada)
--- ============================================
--- Nota: Esta tabela é usada pelo sistema de pagamento legado
--- A tabela 'payment' é a versão normalizada
-CREATE TABLE
-    `pagamentos` (
-        `id` INT (11) NOT NULL AUTO_INCREMENT,
-        `servico_id` INT (11) NOT NULL,
-        `cliente_id` INT (11) NOT NULL,
-        `prestador_id` INT (11) NOT NULL,
-        `valor` DECIMAL(10, 2) NOT NULL,
-        `forma_pagamento` ENUM ('cartao', 'pix', 'transferencia') NOT NULL,
-        `status` ENUM (
-            'pendente',
-            'aprovado',
-            'aguardando_pix',
-            'aguardando_confirmacao',
-            'recusado',
-            'estornado'
-        ) NOT NULL,
-        `data_pagamento` DATETIME NOT NULL,
-        `comprovante` VARCHAR(255) DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        KEY `fk_pagamentos_servico` (`servico_id`),
-        KEY `fk_pagamentos_cliente` (`cliente_id`),
-        KEY `fk_pagamentos_prestador` (`prestador_id`),
-        CONSTRAINT `fk_pagamentos_servico` FOREIGN KEY (`servico_id`) REFERENCES `servicos` (`id`) ON DELETE CASCADE,
-        CONSTRAINT `fk_pagamentos_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE,
-        CONSTRAINT `fk_pagamentos_prestador` FOREIGN KEY (`prestador_id`) REFERENCES `service_provider` (`service_provider_id`) ON DELETE CASCADE
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 -- ============================================
 -- TABELA: NOTIFICACOES (Notificações do Sistema)
