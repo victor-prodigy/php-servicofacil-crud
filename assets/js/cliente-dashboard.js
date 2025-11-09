@@ -53,18 +53,42 @@ async function checkAuthentication() {
 async function carregarServicos() {
     try {
         const response = await fetch('../php/servico/listar-servico.php');
-        const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.message);
+        
+        // Verificar se a resposta é OK
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
         }
+        
+        // Verificar se o conteúdo é JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Resposta não é JSON:', text);
+            throw new Error('Resposta do servidor não é JSON válido');
+        }
+        
+        const data = await response.json();
 
         const tableBody = document.getElementById('servicosTable');
         if (!tableBody) return;
         
         tableBody.innerHTML = ''; // Limpar tabela
 
-        if (data.servicos.length === 0) {
+        // Verificar se há erro na resposta
+        if (!data.success) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        ${data.message || 'Erro ao carregar serviços'}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Verificar se não há serviços
+        if (!data.servicos || data.servicos.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center text-muted">
@@ -80,7 +104,9 @@ async function carregarServicos() {
             const row = document.createElement('tr');
 
             // Formatar data
-            const data_formatada = new Date(servico.data_postagem).toLocaleDateString('pt-BR');
+            const data_formatada = servico.data_postagem ? 
+                new Date(servico.data_postagem).toLocaleDateString('pt-BR') : 
+                'Não informado';
 
             // Definir classe do status
             const statusClass = getStatusClass(servico.status);
@@ -94,12 +120,12 @@ async function carregarServicos() {
 
             row.innerHTML = `
                 <td>
-                    <strong>${servico.titulo}</strong>
+                    <strong>${servico.titulo || 'Sem título'}</strong>
                     <br>
                     <small class="text-muted">Por: ${servico.prestador_nome || 'Prestador'}</small>
                 </td>
                 <td>
-                    <span class="badge bg-info">${servico.categoria}</span>
+                    <span class="badge bg-info">${servico.categoria || 'Sem categoria'}</span>
                 </td>
                 <td>${orcamento}</td>
                 <td><span class="badge ${statusClass}">${getStatusText(servico.status)}</span></td>
@@ -134,6 +160,8 @@ async function carregarServicos() {
                     <td colspan="6" class="text-center text-danger">
                         <i class="bi bi-exclamation-triangle"></i> 
                         Erro ao carregar serviços: ${error.message}
+                        <br>
+                        <small class="text-muted">Verifique sua conexão e tente novamente.</small>
                     </td>
                 </tr>
             `;
@@ -201,6 +229,20 @@ function logout() {
 async function carregarSolicitacoes() {
     try {
         const response = await fetch('../php/servico/listar-solicitacoes.php');
+        
+        // Verificar se a resposta é OK
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+        }
+        
+        // Verificar se o conteúdo é JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Resposta não é JSON:', text);
+            throw new Error('Resposta do servidor não é JSON válido');
+        }
+        
         const data = await response.json();
 
         const tableBody = document.getElementById('solicitacoesTable');
@@ -208,7 +250,25 @@ async function carregarSolicitacoes() {
         
         tableBody.innerHTML = ''; // Limpar tabela
 
-        if (!data.success || data.solicitacoes.length === 0) {
+        // Verificar se há erro na resposta
+        if (!data.success) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        ${data.message || 'Erro ao carregar solicitações'}
+                        <br>
+                        <a href="./servico/nova-solicitacao.html" class="btn btn-success btn-sm mt-2">
+                            <i class="bi bi-plus-circle"></i> Nova Solicitação
+                        </a>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Verificar se não há solicitações
+        if (!data.solicitacoes || data.solicitacoes.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="7" class="text-center text-muted">
@@ -228,22 +288,40 @@ async function carregarSolicitacoes() {
         data.solicitacoes.forEach(solicitacao => {
             const row = document.createElement('tr');
 
-            const dataFormatada = new Date(solicitacao.data_criacao).toLocaleDateString('pt-BR');
+            // Formatar data de criação
+            const dataFormatada = solicitacao.data_criacao ? 
+                new Date(solicitacao.data_criacao).toLocaleDateString('pt-BR') : 
+                'Não informado';
+            
+            // Formatar prazo desejado
+            let prazoFormatado = 'Não definido';
+            if (solicitacao.prazo_desejado) {
+                try {
+                    prazoFormatado = new Date(solicitacao.prazo_desejado).toLocaleDateString('pt-BR');
+                } catch (e) {
+                    prazoFormatado = solicitacao.prazo_desejado;
+                }
+            }
+            
+            // Formatar orçamento
             const orcamento = solicitacao.orcamento_maximo ?
-                `R$ ${parseFloat(solicitacao.orcamento_maximo).toFixed(2)}` :
+                new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(solicitacao.orcamento_maximo) :
                 'Flexível';
 
             row.innerHTML = `
                 <td>
-                    <strong>${solicitacao.titulo}</strong>
+                    <strong>${solicitacao.titulo || 'Sem título'}</strong>
                     <br>
-                    <small class="text-muted">${solicitacao.cidade}</small>
+                    <small class="text-muted">${solicitacao.cidade || 'Não informado'}</small>
                 </td>
                 <td>
-                    <span class="badge bg-info">${solicitacao.categoria}</span>
+                    <span class="badge bg-info">${solicitacao.categoria || 'Sem categoria'}</span>
                 </td>
                 <td>
-                    <small>${solicitacao.prazo_desejado}</small>
+                    <small>${prazoFormatado}</small>
                 </td>
                 <td>${orcamento}</td>
                 <td>
@@ -287,6 +365,8 @@ async function carregarSolicitacoes() {
                     <td colspan="7" class="text-center text-danger">
                         <i class="bi bi-exclamation-triangle"></i> 
                         Erro ao carregar solicitações: ${error.message}
+                        <br>
+                        <small class="text-muted">Verifique sua conexão e tente novamente.</small>
                     </td>
                 </tr>
             `;
@@ -359,6 +439,20 @@ async function excluirSolicitacao(id) {
 async function carregarContratos() {
     try {
         const response = await fetch('../php/servico/listar-contratos-cliente.php');
+        
+        // Verificar se a resposta é OK
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status} ${response.statusText}`);
+        }
+        
+        // Verificar se o conteúdo é JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Resposta não é JSON:', text);
+            throw new Error('Resposta do servidor não é JSON válido');
+        }
+        
         const data = await response.json();
 
         const tableBody = document.getElementById('contratosTable');
@@ -366,7 +460,21 @@ async function carregarContratos() {
         
         tableBody.innerHTML = ''; // Limpar tabela
 
-        if (!data.success || data.contratos.length === 0) {
+        // Verificar se há erro na resposta
+        if (!data.success) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        ${data.message || 'Erro ao carregar contratos'}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Verificar se não há contratos
+        if (!data.contratos || data.contratos.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center text-muted">
@@ -382,7 +490,10 @@ async function carregarContratos() {
         data.contratos.forEach(contrato => {
             const row = document.createElement('tr');
 
-            const dataFormatada = new Date(contrato.created_at).toLocaleDateString('pt-BR');
+            // Formatar data
+            const dataFormatada = contrato.created_at ? 
+                new Date(contrato.created_at).toLocaleDateString('pt-BR') : 
+                'Não informado';
 
             // Definir badge de status
             let statusBadge = '';
@@ -413,15 +524,15 @@ async function carregarContratos() {
 
             row.innerHTML = `
                 <td>
-                    <strong>${contrato.titulo}</strong>
+                    <strong>${contrato.titulo || 'Sem título'}</strong>
                 </td>
                 <td>
-                    ${contrato.prestador_nome}
+                    ${contrato.prestador_nome || 'Prestador não informado'}
                     <br>
                     <small class="text-muted">${contrato.specialty || 'Sem especialidade'}</small>
                 </td>
                 <td>
-                    <span class="badge bg-info">${contrato.categoria}</span>
+                    <span class="badge bg-info">${contrato.categoria || 'Sem categoria'}</span>
                 </td>
                 <td>${statusBadge}</td>
                 <td>
@@ -442,6 +553,8 @@ async function carregarContratos() {
                     <td colspan="6" class="text-center text-danger">
                         <i class="bi bi-exclamation-triangle"></i> 
                         Erro ao carregar contratos: ${error.message}
+                        <br>
+                        <small class="text-muted">Verifique sua conexão e tente novamente.</small>
                     </td>
                 </tr>
             `;
