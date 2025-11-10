@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Administrador - ServiçoFácil</title>
+
+    <!-- Script de verificação de autenticação ANTES de carregar qualquer coisa -->
+    <script>
+      (async function () {
+        try {
+          const response = await fetch("../php/admin/verificar-auth.php");
+          const data = await response.json();
+
+          if (!data.authenticated) {
+            alert(
+              data.usuario.message ||
+                "Acesso negado. Você não tem permissões de administrador."
+            );
+            window.location.href = "login/administrador-signin.html";
+            return;
+          }
+        } catch (error) {
+          console.error("Erro na verificação de autenticação:", error);
+          alert("Erro ao verificar autenticação. Redirecionando para login...");
+          window.location.href = "login/administrador-signin.html";
+        }
+      })();
+    </script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../assets/css/administrador-dashboard.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0">
+          <i class="fas fa-shield-alt me-2"></i>
+          Admin Panel
+        </h4>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="user-info">
+          <h6 class="mb-0" id="userName">Administrador</h6>
+          <small class="text-muted" id="userEmail"
+            >admin@servicofacil.com</small
+          >
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-link active" data-section="overview">
+          <i class="fas fa-chart-line"></i>
+          <span>Visão Geral</span>
+        </a>
+        <a href="#" class="nav-link" data-section="services">
+          <i class="fas fa-briefcase"></i>
+          <span>Gerenciar Serviços</span>
+        </a>
+        <a href="#" class="nav-link" data-section="users">
+          <i class="fas fa-users"></i>
+          <span>Gerenciar Usuários</span>
+        </a>
+        <a href="#" class="nav-link" data-section="proposals">
+          <i class="fas fa-file-invoice"></i>
+          <span>Propostas</span>
+        </a>
+        <a href="#" class="nav-link" data-section="contracts">
+          <i class="fas fa-file-contract"></i>
+          <span>Contratos</span>
+        </a>
+        <a href="#" class="nav-link" data-section="reviews">
+          <i class="fas fa-star"></i>
+          <span>Avaliações</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="nav-link" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sair</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <button class="btn btn-link d-lg-none" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h5 class="mb-0" id="pageTitle">Visão Geral</h5>
+        <div class="ms-auto d-flex align-items-center">
+          <span class="text-muted me-3" id="currentDate"></span>
+          <button class="btn btn-sm btn-primary" id="refreshBtn">
+            <i class="fas fa-sync-alt me-1"></i>Atualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Overview Section -->
+        <div id="overviewSection" class="content-section active">
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon bg-primary">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="totalUsers">0</h3>
+                  <p>Total de Usuários</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon bg-success">
+                  <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="totalServices">0</h3>
+                  <p>Serviços Ativos</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon bg-warning">
+                  <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="totalProposals">0</h3>
+                  <p>Propostas Pendentes</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-icon bg-info">
+                  <i class="fas fa-file-contract"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="totalContracts">0</h3>
+                  <p>Contratos Ativos</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Management Section -->
+        <div id="usersSection" class="content-section">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="mb-0">
+                <i class="fas fa-users me-2"></i>
+                Gerenciar Usuários
+              </h5>
+              <div class="d-flex gap-2">
+                <select
+                  class="form-select form-select-sm"
+                  id="tipoFilter"
+                  style="width: 150px"
+                >
+                  <option value="">Todos os Tipos</option>
+                  <option value="cliente">Cliente</option>
+                  <option value="prestador">Prestador</option>
+                </select>
+                <select
+                  class="form-select form-select-sm"
+                  id="statusFilterUsers"
+                  style="width: 150px"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+                <input
+                  type="search"
+                  class="form-control form-control-sm"
+                  id="searchUsers"
+                  placeholder="Buscar usuários..."
+                  style="width: 250px"
+                />
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Estatísticas de Usuários -->
+              <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                  <div class="card bg-primary text-white">
+                    <div class="card-body">
+                      <h6 class="card-title">Total de Usuários</h6>
+                      <h3 id="statTotalUsuarios">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card bg-success text-white">
+                    <div class="card-body">
+                      <h6 class="card-title">Clientes</h6>
+                      <h3 id="statTotalClientes">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card bg-info text-white">
+                    <div class="card-body">
+                      <h6 class="card-title">Prestadores</h6>
+                      <h3 id="statTotalPrestadores">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card bg-warning text-white">
+                    <div class="card-body">
+                      <h6 class="card-title">Usuários Ativos</h6>
+                      <h3 id="statUsuariosAtivos">0</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-hover" id="usersTable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nome</th>
+                      <th>Email</th>
+                      <th>Telefone</th>
+                      <th>Tipo</th>
+                      <th>Status</th>
+                      <th>Data Cadastro</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services Management Section -->
+        <div id="servicesSection" class="content-section">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="mb-0">
+                <i class="fas fa-briefcase me-2"></i>
+                Gerenciar Serviços de Usuário
+              </h5>
+              <div class="d-flex gap-2">
+                <select
+                  class="form-select form-select-sm"
+                  id="statusFilter"
+                  style="width: 150px"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="em_andamento">Em Andamento</option>
+                  <option value="concluido">Concluído</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+                <input
+                  type="search"
+                  class="form-control form-control-sm"
+                  id="searchServices"
+                  placeholder="Buscar serviços..."
+                  style="width: 250px"
+                />
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="servicesTable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cliente</th>
+                      <th>Título</th>
+                      <th>Categoria</th>
+                      <th>Localização</th>
+                      <th>Status</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para detalhes do usuário -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-user me-2"></i>
+              Detalhes do Usuário
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="userDetailsContent">
+            <!-- Conteúdo será carregado dinamicamente -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para detalhes do serviço -->
+    <div class="modal fade" id="serviceDetailsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-briefcase me-2"></i>
+              Detalhes do Serviço
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="serviceDetailsContent">
+            <!-- Conteúdo será carregado dinamicamente -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fechar
+            </button>
+            <button type="button" class="btn btn-primary" id="editServiceBtn">
+              Editar Serviço
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para editar serviço -->
+    <div class="modal fade" id="editServiceModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-edit me-2"></i>
+              Editar Serviço
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editServiceForm">
+              <input type="hidden" id="editServiceId" />
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editTitulo" class="form-label">Título</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editTitulo"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editCategoria" class="form-label"
+                      >Categoria</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editCategoria"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="editDescricao" class="form-label">Descrição</label>
+                <textarea
+                  class="form-control"
+                  id="editDescricao"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editEndereco" class="form-label"
+                      >Endereço</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editEndereco"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editCidade" class="form-label">Cidade</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editCidade"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editOrcamento" class="form-label"
+                      >Orçamento Máximo</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editOrcamento"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="editPrazo" class="form-label"
+                      >Prazo Desejado</label
+                    >
+                    <input type="date" class="form-control" id="editPrazo" />
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="editStatus" class="form-label">Status</label>
+                <select class="form-select" id="editStatus" required>
+                  <option value="pendente">Pendente</option>
+                  <option value="em_andamento">Em Andamento</option>
+                  <option value="concluido">Concluído</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="editObservacoes" class="form-label"
+                  >Observações</label
+                >
+                <textarea
+                  class="form-control"
+                  id="editObservacoes"
+                  rows="2"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="saveServiceBtn">
+              Salvar Alterações
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Dashboard JS -->
+    <script src="../assets/js/administrador-dashboard.js"></script>
+  </body>
+</html>
+
