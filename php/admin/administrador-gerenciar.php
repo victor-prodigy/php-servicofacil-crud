@@ -1,3 +1,4 @@
+/************* ✨ Windsurf Command 🌟 *************/
 <?php
 session_start();
 
@@ -48,9 +49,12 @@ try {
                             sr.*,
                             u.name as cliente_nome,
                             u.email as cliente_email,
+                            u.phone_number as cliente_telefone,
+                            u.instagram as cliente_instagram
                             u.phone_number as cliente_telefone
                         FROM service_request sr
                         JOIN cliente c ON sr.cliente_id = c.id
+                        JOIN user u ON c.user_id = u.id
                         JOIN user u ON c.user_id = u.user_id
                         WHERE sr.request_id = ?";
 
@@ -77,6 +81,8 @@ try {
             }
 
             // Campos permitidos para atualização
+            // 1. novo campo instagram
+            $allowed_fields = ['titulo', 'categoria', 'descricao', 'endereco', 'cidade', 'orcamento_maximo', 'prazo_desejado', 'status', 'observacoes', 'instagram'];
             $allowed_fields = ['titulo', 'categoria', 'descricao', 'endereco', 'cidade', 'orcamento_maximo', 'prazo_desejado', 'status', 'observacoes'];
             $update_fields = [];
             $params = [];
@@ -165,3 +171,5 @@ try {
 }
 ?>
 
+
+/******* eca086aa-6e9c-4c0d-bed8-c90e3fc44df3 *******/

@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const matchesSearch = !searchTerm || 
         user.nome.toLowerCase().includes(searchTerm) ||
         user.email.toLowerCase().includes(searchTerm) ||
-        user.telefone.toLowerCase().includes(searchTerm);
+        (user.instagram && user.instagram.toLowerCase().includes(searchTerm));
       
       const matchesTipo = !tipoFilter || user.tipo_usuario === tipoFilter;
       const matchesStatus = !statusFilter || user.status === statusFilter;
@@ -276,12 +276,16 @@ document.addEventListener('DOMContentLoaded', function () {
         <td>#${user.user_id}</td>
         <td>
           <div>
-            <strong>${user.nome}</strong>
+            <strong>${user.nome || ''}</strong>
             ${user.verificado ? '<br><small class="text-success"><i class="fas fa-check-circle"></i> Verificado</small>' : ''}
           </div>
         </td>
+<<<<<<< HEAD
         <td>${user.email}</td>
         <td>${user.telefone}</td>
+=======
+        <td>${user.email || ''}</td>
+>>>>>>> 9c0aa016888fa96833f36704ef09b85568c383e8
         <td>${user.instagram || 'Não informado'}</td>
         <td>
           <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">
@@ -294,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
           </span>
         </td>
         <td>
-          <small>${user.data_cadastro}</small>
+          <small>${user.data_cadastro || ''}</small>
         </td>
         <td>
           <div class="btn-group btn-group-sm">
@@ -362,7 +366,11 @@ document.addEventListener('DOMContentLoaded', function () {
               <p><strong>Nome:</strong> ${user.nome}</p>
               <p><strong>Email:</strong> ${user.email}</p>
               <p><strong>Telefone:</strong> ${user.telefone}</p>
+<<<<<<< HEAD
               ${user.instagram ? `<p><strong>Instagram:</strong> ${user.instagram}</p>` : ''}
+=======
+              <p><strong>Instagram:</strong> ${user.instagram || 'Não informado'}</p>
+>>>>>>> 9c0aa016888fa96833f36704ef09b85568c383e8
               <p><strong>Tipo:</strong> <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}</span></p>
             </div>
             <div class="col-md-6">
