@@ -18,7 +18,6 @@ try {
                 u.email,
                 u.name,
                 u.phone_number,
-                -- 1. novo dado
                 u.instagram,
                 u.status,
                 u.identity_verified,
@@ -34,7 +33,6 @@ try {
                     WHEN sp.service_provider_id IS NOT NULL THEN sp.service_provider_id
                     ELSE NULL
                 END as tipo_id,
-                c.instagram,
                 sp.specialty,
                 sp.location as prestador_location,
                 -- Contagem de atividades
@@ -58,11 +56,7 @@ try {
             'nome' => $usuario['name'],
             'email' => $usuario['email'],
             'telefone' => $usuario['phone_number'] ?: 'Não informado',
-<<<<<<< HEAD
             'instagram' => $usuario['instagram'] ?: 'Não informado',
-=======
-            'instagram' => (!empty($usuario['instagram']) && $usuario['instagram'] !== null) ? $usuario['instagram'] : 'Não informado',
->>>>>>> 9c0aa016888fa96833f36704ef09b85568c383e8
             'tipo_usuario' => $usuario['tipo_usuario'],
             'tipo_id' => $usuario['tipo_id'],
             'verificado' => $usuario['identity_verified'] ? true : false,

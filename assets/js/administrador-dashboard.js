@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const response = await fetch('../php/admin/verificar-auth.php');
       const data = await response.json();
 
-        // Remover loading
+      // Remover loading
       document.getElementById('loadingAuth')?.remove();
 
       if (!data.authenticated) {
@@ -241,11 +241,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const statusFilter = document.getElementById('statusFilterUsers')?.value || '';
 
     let filteredUsers = allUsers.filter(user => {
-      const matchesSearch = !searchTerm || 
+      const matchesSearch = !searchTerm ||
         user.nome.toLowerCase().includes(searchTerm) ||
         user.email.toLowerCase().includes(searchTerm) ||
-        (user.instagram && user.instagram.toLowerCase().includes(searchTerm));
-      
+        user.telefone.toLowerCase().includes(searchTerm);
+
       const matchesTipo = !tipoFilter || user.tipo_usuario === tipoFilter;
       const matchesStatus = !statusFilter || user.status === statusFilter;
 
@@ -280,12 +280,8 @@ document.addEventListener('DOMContentLoaded', function () {
             ${user.verificado ? '<br><small class="text-success"><i class="fas fa-check-circle"></i> Verificado</small>' : ''}
           </div>
         </td>
-<<<<<<< HEAD
-        <td>${user.email}</td>
-        <td>${user.telefone}</td>
-=======
         <td>${user.email || ''}</td>
->>>>>>> 9c0aa016888fa96833f36704ef09b85568c383e8
+        <td>${user.telefone || 'Não informado'}</td>
         <td>${user.instagram || 'Não informado'}</td>
         <td>
           <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">
@@ -305,14 +301,14 @@ document.addEventListener('DOMContentLoaded', function () {
             <button class="btn btn-outline-primary" onclick="viewUserDetails(${user.user_id})" title="Ver detalhes">
               <i class="fas fa-eye"></i>
             </button>
-            ${user.status === 'ativo' 
-              ? `<button class="btn btn-outline-warning" onclick="manageUser(${user.user_id}, 'desativar')" title="Desativar">
+            ${user.status === 'ativo'
+        ? `<button class="btn btn-outline-warning" onclick="manageUser(${user.user_id}, 'desativar')" title="Desativar">
                    <i class="fas fa-ban"></i>
                  </button>`
-              : `<button class="btn btn-outline-success" onclick="manageUser(${user.user_id}, 'ativar')" title="Ativar">
+        : `<button class="btn btn-outline-success" onclick="manageUser(${user.user_id}, 'ativar')" title="Ativar">
                    <i class="fas fa-check"></i>
                  </button>`
-            }
+      }
             <button class="btn btn-outline-danger" onclick="manageUser(${user.user_id}, 'excluir')" title="Excluir">
               <i class="fas fa-trash"></i>
             </button>
@@ -331,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (data.success) {
         const user = data.usuario;
         const stats = data.estatisticas || {};
-        
+
         let statsHtml = '';
         if (user.tipo_usuario === 'cliente') {
           statsHtml = `
@@ -366,11 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <p><strong>Nome:</strong> ${user.nome}</p>
               <p><strong>Email:</strong> ${user.email}</p>
               <p><strong>Telefone:</strong> ${user.telefone}</p>
-<<<<<<< HEAD
               ${user.instagram ? `<p><strong>Instagram:</strong> ${user.instagram}</p>` : ''}
-=======
-              <p><strong>Instagram:</strong> ${user.instagram || 'Não informado'}</p>
->>>>>>> 9c0aa016888fa96833f36704ef09b85568c383e8
               <p><strong>Tipo:</strong> <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}</span></p>
             </div>
             <div class="col-md-6">
@@ -405,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
       'excluir': 'excluir permanentemente'
     };
 
-    const confirmMessage = acao === 'excluir' 
+    const confirmMessage = acao === 'excluir'
       ? 'Tem certeza que deseja EXCLUIR PERMANENTEMENTE este usuário? Esta ação não pode ser desfeita!'
       : `Tem certeza que deseja ${acoes[acao]} este usuário?`;
 
@@ -772,13 +764,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('removePostagemModal');
     const confirmBtn = document.getElementById('confirmRemovePostagemBtn');
     confirmBtn.dataset.serviceId = serviceId;
-    
+
     // Atualizar texto do modal se necessário
     const modalBody = modal.querySelector('.modal-body p');
     if (modalBody) {
       modalBody.textContent = `Tem certeza que deseja remover a postagem "${titulo}"? Esta ação não pode ser desfeita.`;
     }
-    
+
     new bootstrap.Modal(modal).show();
   };
 
