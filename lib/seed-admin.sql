@@ -15,7 +15,8 @@ WHERE
 -- Inserir usuário administrador
 -- Email: admin@servicofacil.com
 -- Senha: admin123
--- Hash da senha: password_hash('admin123', PASSWORD_DEFAULT)
+-- Hash da senha gerado com: password_hash('admin123', PASSWORD_DEFAULT)
+-- NOTA: O hash pode variar a cada execução. Use o script PHP seed-admin.php para garantir um hash válido.
 INSERT INTO
     `user` (
         `email`,
@@ -39,7 +40,14 @@ VALUES
         TRUE,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
-    );
+    )
+ON DUPLICATE KEY UPDATE
+    `password` = VALUES(`password`),
+    `name` = VALUES(`name`),
+    `phone_number` = VALUES(`phone_number`),
+    `status` = 'ativo',
+    `identity_verified` = TRUE,
+    `updated_at` = CURRENT_TIMESTAMP;
 
 -- ============================================
 -- 2. CONFIRMAR INSERÇÃO
@@ -68,8 +76,14 @@ Senha: admin123
 
 URL DE ACESSO:
 ==============
-Login: http://localhost/php-servicofacil-crud-incompleto/client/login/admin-signin.html
+Login: http://localhost/php-servicofacil-crud-incompleto/client/login/administrador-signin.html
 Dashboard: http://localhost/php-servicofacil-crud-incompleto/client/administrador-dashboard.html
+
+COMO EXECUTAR:
+==============
+1. Via SQL: Execute este arquivo no MySQL/MariaDB
+2. Via PHP: Execute o script php/seed-admin.php no terminal
+   php seed-admin.php
 
 FUNCIONALIDADES:
 ================
