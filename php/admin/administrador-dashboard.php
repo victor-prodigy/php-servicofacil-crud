@@ -1,3 +1,4 @@
+/************* ✨ Windsurf Command 🌟 *************/
 <?php
 
 session_start();
@@ -53,6 +54,10 @@ try {
       // Contratos ativos (simulado - pode ser adaptado)
       $stats['total_contracts'] = 0;
 
+      // 1. novo campo Instagram
+      $stmt = $pdo->query("SELECT instagram FROM setting");
+      $stats['instagram'] = $stmt->fetch()['instagram'];
+
       retornarSucesso($stats);
       break;
 
@@ -74,7 +79,8 @@ try {
                         sr.created_at,
                         u.name as cliente_nome,
                         u.email as cliente_email,
-                        u.phone_number as cliente_telefone
+                        u.instagram as cliente_telefone
+                        u.
                     FROM service_request sr
                     JOIN cliente c ON sr.cliente_id = c.id
                     JOIN user u ON c.user_id = u.user_id
@@ -120,3 +126,5 @@ try {
   retornarErro('Erro interno do servidor', 500);
 }
 
+
+/*******  e8fd0f97-5311-49bf-9084-83021882528d  *******/
