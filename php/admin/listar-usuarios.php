@@ -18,6 +18,8 @@ try {
                 u.email,
                 u.name,
                 u.phone_number,
+                -- 1. novo dado
+                u.instagram,
                 u.status,
                 u.identity_verified,
                 u.created_at,
@@ -42,11 +44,11 @@ try {
             LEFT JOIN service_provider sp ON u.user_id = sp.user_id
             WHERE u.user_type IN ('cliente', 'prestador')
             ORDER BY u.created_at DESC";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Formatar os dados para o frontend
     $usuarios_formatados = [];
     foreach ($usuarios as $usuario) {
@@ -55,6 +57,7 @@ try {
             'nome' => $usuario['name'],
             'email' => $usuario['email'],
             'telefone' => $usuario['phone_number'] ?: 'Não informado',
+            'instagram' => (!empty($usuario['instagram']) && $usuario['instagram'] !== null) ? $usuario['instagram'] : 'Não informado',
             'tipo_usuario' => $usuario['tipo_usuario'],
             'tipo_id' => $usuario['tipo_id'],
             'verificado' => $usuario['identity_verified'] ? true : false,
@@ -72,7 +75,7 @@ try {
             'updated_at_raw' => $usuario['updated_at']
         ];
     }
-    
+
     // Calcular estatísticas gerais
     $stats = [
         'total_usuarios' => count($usuarios_formatados),
@@ -81,17 +84,14 @@ try {
         'usuarios_ativos' => count(array_filter($usuarios_formatados, fn($u) => $u['status'] === 'ativo')),
         'usuarios_inativos' => count(array_filter($usuarios_formatados, fn($u) => $u['status'] === 'inativo'))
     ];
-    
+
     echo json_encode([
         'success' => true,
         'usuarios' => $usuarios_formatados,
         'estatisticas' => $stats
     ]);
-
 } catch (PDOException $e) {
     error_log("Erro ao buscar usuários: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => 'Erro interno do servidor']);
 }
-?>
-
