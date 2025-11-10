@@ -35,6 +35,7 @@ try {
                     ELSE 'indefinido'
                 END as tipo_usuario,
                 c.id as cliente_id,
+                c.instagram,
                 sp.service_provider_id,
                 sp.specialty,
                 sp.location as prestador_location
@@ -116,6 +117,7 @@ try {
             'nome' => $usuario['name'],
             'email' => $usuario['email'],
             'telefone' => $usuario['phone_number'] ?: 'Não informado',
+            'instagram' => $usuario['instagram'] ?: 'Não informado',
             'tipo_usuario' => $usuario['tipo_usuario'],
             'verificado' => $usuario['identity_verified'] ? true : false,
             'status' => $usuario['status'] ?: 'ativo',

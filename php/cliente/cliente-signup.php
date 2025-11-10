@@ -34,11 +34,11 @@ function criarUsuario($pdo, $dados) {
 }
 
 // 👤 Função para criar cliente
-function criarCliente($pdo, $user_id) {
-    $sql = "INSERT INTO cliente (user_id) VALUES (?)";
+function criarCliente($pdo, $user_id, $instagram = null) {
+    $sql = "INSERT INTO cliente (user_id, instagram) VALUES (?, ?)";
     $stmt = $pdo->prepare($sql);
     
-    if ($stmt->execute([$user_id])) {
+    if ($stmt->execute([$user_id, $instagram])) {
         return $pdo->lastInsertId();
     }
     return false;
@@ -67,7 +67,8 @@ try {
         'name' => $_POST['name'] ?? '',
         'email' => $_POST['email'] ?? '',
         'phone_number' => $_POST['phone_number'] ?? '',
-        'password' => $_POST['password'] ?? ''
+        'password' => $_POST['password'] ?? '',
+        'instagram' => $_POST['instagram'] ?? ''
     ];
     
     // ✅ Validação
@@ -90,7 +91,7 @@ try {
     }
     
     // 👤 Criação do cliente
-    $cliente_id = criarCliente($pdo, $user_id);
+    $cliente_id = criarCliente($pdo, $user_id, $dados['instagram']);
     if (!$cliente_id) {
         enviarResposta(false, "Erro ao criar cliente");
     }

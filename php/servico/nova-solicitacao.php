@@ -121,7 +121,6 @@ try {
   error_log("DEBUG: Verificando autenticação...");
   error_log("SESSION: " . print_r($_SESSION, true));
 
-  $observacao = $_POST['observacao'];
 
   if (!isset($_SESSION['cliente_id']) || $_SESSION['usuario_tipo'] !== 'cliente') {
     error_log("ERROR: Usuário não autenticado ou não é cliente");

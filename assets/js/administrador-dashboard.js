@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (users.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="text-center py-4">
+          <td colspan="9" class="text-center py-4">
             <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
             <p class="text-muted">Nenhum usuário encontrado</p>
           </td>
@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </td>
         <td>${user.email}</td>
         <td>${user.telefone}</td>
+        <td>${user.instagram || 'Não informado'}</td>
         <td>
           <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">
             ${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}
@@ -361,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <p><strong>Nome:</strong> ${user.nome}</p>
               <p><strong>Email:</strong> ${user.email}</p>
               <p><strong>Telefone:</strong> ${user.telefone}</p>
+              ${user.instagram ? `<p><strong>Instagram:</strong> ${user.instagram}</p>` : ''}
               <p><strong>Tipo:</strong> <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}</span></p>
             </div>
             <div class="col-md-6">

@@ -32,6 +32,7 @@ try {
                     WHEN sp.service_provider_id IS NOT NULL THEN sp.service_provider_id
                     ELSE NULL
                 END as tipo_id,
+                c.instagram,
                 sp.specialty,
                 sp.location as prestador_location,
                 -- Contagem de atividades
@@ -55,6 +56,7 @@ try {
             'nome' => $usuario['name'],
             'email' => $usuario['email'],
             'telefone' => $usuario['phone_number'] ?: 'Não informado',
+            'instagram' => $usuario['instagram'] ?: 'Não informado',
             'tipo_usuario' => $usuario['tipo_usuario'],
             'tipo_id' => $usuario['tipo_id'],
             'verificado' => $usuario['identity_verified'] ? true : false,
