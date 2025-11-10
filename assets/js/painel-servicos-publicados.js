@@ -112,6 +112,14 @@ function renderizarPostagens(postagens) {
                                 <small class="text-muted">Criado em: ${postagem.created_at}</small>
                             </div>
                             <div>
+                                ${postagem.status === 'ativo' 
+                                    ? `<button class="btn btn-sm btn-warning btn-action" onclick="bloquearPostagem(${postagem.service_id}, '${escapeHtml(postagem.titulo)}')" title="Bloquear postagem">
+                                        <i class="bi bi-lock"></i> Bloquear
+                                       </button>`
+                                    : `<button class="btn btn-sm btn-success btn-action" onclick="desbloquearPostagem(${postagem.service_id}, '${escapeHtml(postagem.titulo)}')" title="Desbloquear postagem">
+                                        <i class="bi bi-unlock"></i> Desbloquear
+                                       </button>`
+                                }
                                 <button class="btn btn-sm btn-primary btn-action" onclick="editarPostagem(${postagem.service_id})">
                                     <i class="bi bi-pencil"></i> Editar
                                 </button>
@@ -183,6 +191,66 @@ async function salvarEdicao() {
     } catch (error) {
         console.error('Erro:', error);
         alert('Erro ao atualizar postagem. Por favor, tente novamente.');
+    }
+}
+
+// Função para bloquear postagem
+async function bloquearPostagem(serviceId, titulo) {
+    if (!confirm(`Tem certeza que deseja bloquear a postagem "${titulo}"? Ela ficará invisível para outros usuários.`)) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('service_id', serviceId);
+    formData.append('acao', 'bloquear');
+
+    try {
+        const response = await fetch('../../php/prestador/bloquear-postagem.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Postagem bloqueada com sucesso! Ela não está mais visível para outros usuários.');
+            carregarPostagens();
+        } else {
+            alert('Erro ao bloquear postagem: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao bloquear postagem. Por favor, tente novamente.');
+    }
+}
+
+// Função para desbloquear postagem
+async function desbloquearPostagem(serviceId, titulo) {
+    if (!confirm(`Deseja desbloquear a postagem "${titulo}"? Ela ficará visível novamente para outros usuários.`)) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('service_id', serviceId);
+    formData.append('acao', 'desbloquear');
+
+    try {
+        const response = await fetch('../../php/prestador/bloquear-postagem.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Postagem desbloqueada com sucesso! Ela está novamente visível para outros usuários.');
+            carregarPostagens();
+        } else {
+            alert('Erro ao desbloquear postagem: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao desbloquear postagem. Por favor, tente novamente.');
     }
 }
 

@@ -85,6 +85,10 @@
           <i class="fas fa-star"></i>
           <span>Avaliações</span>
         </a>
+        <a href="#" class="nav-link" data-section="postagens">
+          <i class="fas fa-newspaper"></i>
+          <span>Gerenciar Postagens</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -311,6 +315,67 @@
             </div>
           </div>
         </div>
+
+        <!-- Postagens Management Section -->
+        <div id="postagensSection" class="content-section">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="mb-0">
+                <i class="fas fa-newspaper me-2"></i>
+                Gerenciar Postagens de Prestadores
+              </h5>
+              <div class="d-flex gap-2">
+                <select
+                  class="form-select form-select-sm"
+                  id="statusFilterPostagens"
+                  style="width: 150px"
+                >
+                  <option value="">Todos os Status</option>
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+                <select
+                  class="form-select form-select-sm"
+                  id="disponibilidadeFilterPostagens"
+                  style="width: 150px"
+                >
+                  <option value="">Todas</option>
+                  <option value="disponivel">Disponível</option>
+                  <option value="indisponivel">Indisponível</option>
+                </select>
+                <input
+                  type="search"
+                  class="form-control form-control-sm"
+                  id="searchPostagens"
+                  placeholder="Buscar postagens..."
+                  style="width: 250px"
+                />
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="postagensTable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Prestador</th>
+                      <th>Título</th>
+                      <th>Categoria</th>
+                      <th>Preço</th>
+                      <th>Status</th>
+                      <th>Disponibilidade</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -373,6 +438,60 @@
             </button>
             <button type="button" class="btn btn-primary" id="editServiceBtn">
               Editar Serviço
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para remover postagem -->
+    <div class="modal fade" id="removePostagemModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-trash me-2"></i>
+              Remover Postagem
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Tem certeza que deseja remover esta postagem? Esta ação não pode
+              ser desfeita.
+            </p>
+            <div class="mb-3">
+              <label for="motivoRemocao" class="form-label"
+                >Motivo da remoção:</label
+              >
+              <textarea
+                class="form-control"
+                id="motivoRemocao"
+                rows="3"
+                placeholder="Descreva o motivo da remoção (ex: conteúdo inapropriado)"
+              >
+Conteúdo inapropriado</textarea
+              >
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="confirmRemovePostagemBtn"
+            >
+              Remover Postagem
             </button>
           </div>
         </div>
@@ -524,4 +643,3 @@
     <script src="../assets/js/administrador-dashboard.js"></script>
   </body>
 </html>
-

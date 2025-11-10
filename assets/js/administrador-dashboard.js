@@ -105,6 +105,39 @@ document.addEventListener('DOMContentLoaded', function () {
         loadUsersData();
       });
     }
+
+    // Search and filter for postagens
+    const searchPostagens = document.getElementById('searchPostagens');
+    const statusFilterPostagens = document.getElementById('statusFilterPostagens');
+    const disponibilidadeFilterPostagens = document.getElementById('disponibilidadeFilterPostagens');
+
+    if (searchPostagens) {
+      searchPostagens.addEventListener('input', debounce(() => {
+        loadPostagensData();
+      }, 300));
+    }
+
+    if (statusFilterPostagens) {
+      statusFilterPostagens.addEventListener('change', () => {
+        loadPostagensData();
+      });
+    }
+
+    if (disponibilidadeFilterPostagens) {
+      disponibilidadeFilterPostagens.addEventListener('change', () => {
+        loadPostagensData();
+      });
+    }
+
+    // Confirm remove postagem button
+    const confirmRemovePostagemBtn = document.getElementById('confirmRemovePostagemBtn');
+    if (confirmRemovePostagemBtn) {
+      confirmRemovePostagemBtn.addEventListener('click', () => {
+        const serviceId = confirmRemovePostagemBtn.dataset.serviceId;
+        const motivo = document.getElementById('motivoRemocao').value || 'Conteúdo inapropriado';
+        removePostagem(serviceId, motivo);
+      });
+    }
   }
 
   async function checkAuth() {
@@ -563,7 +596,8 @@ document.addEventListener('DOMContentLoaded', function () {
       users: 'Gerenciar Usuários',
       proposals: 'Propostas',
       contracts: 'Contratos',
-      reviews: 'Avaliações'
+      reviews: 'Avaliações',
+      postagens: 'Gerenciar Postagens'
     };
 
     pageTitle.textContent = titles[sectionName] || 'Dashboard';
@@ -573,6 +607,8 @@ document.addEventListener('DOMContentLoaded', function () {
       loadServicesData();
     } else if (sectionName === 'users') {
       loadUsersData();
+    } else if (sectionName === 'postagens') {
+      loadPostagensData();
     }
   }
 
@@ -615,6 +651,151 @@ document.addEventListener('DOMContentLoaded', function () {
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
+  }
+
+  // ========== POSTAGENS MANAGEMENT FUNCTIONS ==========
+  async function loadPostagensData() {
+    try {
+      const search = document.getElementById('searchPostagens')?.value || '';
+      const status = document.getElementById('statusFilterPostagens')?.value || '';
+      const disponibilidade = document.getElementById('disponibilidadeFilterPostagens')?.value || '';
+
+      const params = new URLSearchParams({
+        search: search,
+        status: status,
+        disponibilidade: disponibilidade
+      });
+
+      const response = await fetch(`../php/admin/listar-postagens.php?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        renderPostagensTable(data.postagens);
+      } else {
+        console.error('Erro ao carregar postagens:', data.message);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar postagens:', error);
+    }
+  }
+
+  function renderPostagensTable(postagens) {
+    const tbody = document.querySelector('#postagensTable tbody');
+    if (!tbody) {
+      const table = document.getElementById('postagensTable');
+      const newTbody = document.createElement('tbody');
+      table.appendChild(newTbody);
+      return renderPostagensTable(postagens);
+    }
+
+    if (postagens.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="text-center py-4">
+            <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+            <p class="text-muted">Nenhuma postagem encontrada</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = postagens.map(postagem => `
+      <tr>
+        <td>#${postagem.service_id}</td>
+        <td>
+          <div>
+            <strong>${postagem.prestador_nome}</strong>
+            <br>
+            <small class="text-muted">${postagem.prestador_email}</small>
+          </div>
+        </td>
+        <td>
+          <div>
+            <strong>${postagem.titulo}</strong>
+            <br>
+            <small class="text-muted">${truncateText(postagem.descricao, 50)}</small>
+          </div>
+        </td>
+        <td>
+          <span class="badge bg-secondary">${postagem.categoria}</span>
+        </td>
+        <td>
+          <strong>R$ ${postagem.preco}</strong>
+        </td>
+        <td>
+          <span class="badge ${postagem.status === 'ativo' ? 'bg-success' : 'bg-secondary'}">
+            ${postagem.status === 'ativo' ? 'Ativo' : 'Inativo'}
+          </span>
+        </td>
+        <td>
+          <span class="badge ${postagem.disponibilidade === 'disponivel' ? 'bg-info' : 'bg-warning'}">
+            ${postagem.disponibilidade === 'disponivel' ? 'Disponível' : 'Indisponível'}
+          </span>
+        </td>
+        <td>
+          <small>${postagem.created_at}</small>
+        </td>
+        <td>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-danger" onclick="showRemovePostagemModal(${postagem.service_id}, '${escapeHtml(postagem.titulo)}')" title="Remover">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function escapeHtml(text) {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+  }
+
+  window.showRemovePostagemModal = function (serviceId, titulo) {
+    const modal = document.getElementById('removePostagemModal');
+    const confirmBtn = document.getElementById('confirmRemovePostagemBtn');
+    confirmBtn.dataset.serviceId = serviceId;
+    
+    // Atualizar texto do modal se necessário
+    const modalBody = modal.querySelector('.modal-body p');
+    if (modalBody) {
+      modalBody.textContent = `Tem certeza que deseja remover a postagem "${titulo}"? Esta ação não pode ser desfeita.`;
+    }
+    
+    new bootstrap.Modal(modal).show();
+  };
+
+  async function removePostagem(serviceId, motivo) {
+    try {
+      const formData = new FormData();
+      formData.append('service_id', serviceId);
+      formData.append('motivo', motivo);
+
+      const response = await fetch('../php/admin/remover-postagem.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Postagem removida com sucesso! A ação foi registrada no histórico administrativo.');
+        bootstrap.Modal.getInstance(document.getElementById('removePostagemModal')).hide();
+        loadPostagensData();
+      } else {
+        alert('Erro ao remover postagem: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro de conexão ao remover postagem');
+    }
   }
 
   async function logout() {
