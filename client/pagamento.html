@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiçoFácil - Pagamento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link href="../assets/css/main.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Navegação -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="cliente-dashboard.html">Dashboard</a></li>
+                <li class="breadcrumb-item active">Pagamento</li>
+            </ol>
+        </nav>
+
+        <!-- Detalhes do Serviço -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Detalhes do Serviço</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 id="servicoTitulo" class="mb-3">Carregando...</h5>
+                        <p id="servicoDescricao" class="text-muted mb-3">Carregando...</p>
+                        <div class="mb-3">
+                            <strong>Prestador:</strong> <span id="prestadorNome">Carregando...</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Status:</strong> 
+                            <span id="servicoStatus" class="badge bg-success">Ativo</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="h3">Valor Total:</div>
+                        <div class="h2 text-primary mb-3" id="valorTotal">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formas de Pagamento -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Escolha a Forma de Pagamento</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <!-- Cartão de Crédito -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="formaPagamento" 
+                                           id="cartaoCredito" value="cartao" checked>
+                                    <label class="form-check-label" for="cartaoCredito">
+                                        <h5 class="mb-2">Cartão de Crédito</h5>
+                                        <p class="text-muted small mb-0">
+                                            Pagamento seguro<br>
+                                            Parcele em até 12x
+                                        </p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PIX -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="formaPagamento" 
+                                           id="pix" value="pix">
+                                    <label class="form-check-label" for="pix">
+                                        <h5 class="mb-2">PIX</h5>
+                                        <p class="text-muted small mb-0">
+                                            Pagamento instantâneo<br>
+                                            Aprovação imediata
+                                        </p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transferência -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="formaPagamento" 
+                                           id="transferencia" value="transferencia">
+                                    <label class="form-check-label" for="transferencia">
+                                        <h5 class="mb-2">Transferência</h5>
+                                        <p class="text-muted small mb-0">
+                                            Transferência bancária<br>
+                                            1-3 dias úteis
+                                        </p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulários de Pagamento -->
+                <div id="formulariosContainer">
+                    <!-- Formulário Cartão -->
+                    <div id="formCartao" class="payment-form">
+                        <h5 class="mb-4">Dados do Cartão</h5>
+                        <form id="cartaoForm" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="numeroCartao" class="form-label">Número do Cartão</label>
+                                <input type="text" class="form-control" id="numeroCartao" required
+                                       placeholder="0000 0000 0000 0000">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nomeCartao" class="form-label">Nome no Cartão</label>
+                                <input type="text" class="form-control" id="nomeCartao" required
+                                       placeholder="Nome como está no cartão">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="validadeCartao" class="form-label">Validade</label>
+                                <input type="text" class="form-control" id="validadeCartao" required
+                                       placeholder="MM/AA">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="cvvCartao" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvvCartao" required
+                                       placeholder="123" maxlength="4">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="parcelas" class="form-label">Parcelas</label>
+                                <select class="form-select" id="parcelas" required>
+                                    <option value="1">1x sem juros</option>
+                                    <option value="2">2x sem juros</option>
+                                    <option value="3">3x sem juros</option>
+                                    <option value="6">6x com juros</option>
+                                    <option value="12">12x com juros</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Formulário PIX -->
+                    <div id="formPix" class="payment-form" style="display: none;">
+                        <div class="text-center">
+                            <h5 class="mb-4">Pagamento via PIX</h5>
+                            <div id="qrCodeContainer" class="mb-4">
+                                <!-- QR Code será gerado aqui -->
+                            </div>
+                            <div class="mb-3">
+                                <p>Ou copie a chave PIX:</p>
+                                <div class="input-group mb-3 w-50 mx-auto">
+                                    <input type="text" id="chavePix" class="form-control" readonly>
+                                    <button class="btn btn-outline-primary" type="button" onclick="copiarChavePix()">
+                                        Copiar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="alert alert-info w-75 mx-auto">
+                                <small>
+                                    Após realizar o pagamento via PIX, o sistema atualizará automaticamente 
+                                    o status do seu pagamento.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário Transferência -->
+                    <div id="formTransferencia" class="payment-form" style="display: none;">
+                        <h5 class="mb-4">Dados para Transferência</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Dados Bancários</h6>
+                                        <p class="mb-1"><strong>Banco:</strong> 001 - Banco do Brasil</p>
+                                        <p class="mb-1"><strong>Agência:</strong> 1234-5</p>
+                                        <p class="mb-1"><strong>Conta:</strong> 12345-6</p>
+                                        <p class="mb-1"><strong>CNPJ:</strong> 12.345.678/0001-90</p>
+                                        <p class="mb-0"><strong>Beneficiário:</strong> ServiçoFácil LTDA</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Envio do Comprovante</h6>
+                                        <div class="mb-3">
+                                            <label for="comprovante" class="form-label">
+                                                Anexar Comprovante de Transferência
+                                            </label>
+                                            <input type="file" class="form-control" id="comprovante" 
+                                                   accept="image/*,.pdf" required>
+                                        </div>
+                                        <small class="text-muted">
+                                            Formatos aceitos: PDF ou imagens (jpg, png)
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Termos e Confirmação -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="aceitarTermos" required>
+                    <label class="form-check-label" for="aceitarTermos">
+                        Li e aceito os <a href="#" data-bs-toggle="modal" data-bs-target="#termosModal">
+                        termos e condições de pagamento</a>
+                    </label>
+                </div>
+                <div class="d-grid gap-2 col-md-6 mx-auto">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="confirmarPagamento()" 
+                            id="btnConfirmarPagamento">
+                        Confirmar Pagamento
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                        Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Termos -->
+    <div class="modal fade" id="termosModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Termos e Condições de Pagamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. Processamento do Pagamento</h6>
+                    <p>O valor será mantido em conta intermediária até a validação do serviço.</p>
+                    
+                    <h6>2. Validação do Serviço</h6>
+                    <p>O cliente deve confirmar a conclusão satisfatória do serviço para liberação do pagamento.</p>
+                    
+                    <h6>3. Liberação do Pagamento</h6>
+                    <p>Após validação, o valor será liberado ao prestador em até 2 dias úteis.</p>
+                    
+                    <h6>4. Garantias e Proteção</h6>
+                    <p>O sistema garante a segurança da transação e proteção contra fraudes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação -->
+    <div class="modal fade" id="confirmacaoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 mb-3">Pagamento Realizado com Sucesso!</h4>
+                    <p class="mb-4">
+                        O valor será liberado ao prestador após sua confirmação de que o 
+                        serviço foi concluído conforme acordado.
+                    </p>
+                    <button type="button" class="btn btn-primary" 
+                            onclick="window.location.href='cliente-dashboard.html'">
+                        Voltar ao Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../assets/js/pagamento.js"></script>
+</body>
+</html>
+
