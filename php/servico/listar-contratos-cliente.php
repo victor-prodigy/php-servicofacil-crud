@@ -40,12 +40,16 @@ try {
               sr.categoria,
               u.name as prestador_nome,
               sp.specialty,
-              CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END as ja_avaliado
+              CASE WHEN r.review_id IS NOT NULL THEN 1 ELSE 0 END as ja_avaliado,
+              p.payment_id,
+              p.status as payment_status,
+              p.amount as payment_amount
             FROM contract c
             INNER JOIN service_request sr ON c.request_id = sr.request_id
             INNER JOIN service_provider sp ON c.service_provider_id = sp.service_provider_id
             INNER JOIN user u ON sp.user_id = u.user_id
             LEFT JOIN review r ON c.contract_id = r.contract_id AND r.cliente_id = c.cliente_id
+            LEFT JOIN payment p ON p.contract_id = c.contract_id
             WHERE c.cliente_id = ?
             ORDER BY c.created_at DESC";
 

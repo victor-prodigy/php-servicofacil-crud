@@ -507,19 +507,47 @@ async function carregarContratos() {
                 statusBadge = '<span class="badge bg-secondary">Pendente</span>';
             }
 
-            // Gerar coluna de avaliação baseada no status
+            // Gerar coluna de ações (avaliação e pagamento) baseada no status
             let avaliacaoHtml = '';
-            if (contrato.status === 'completed' && contrato.ja_avaliado == 0) {
+            
+            // Verificar se precisa pagar
+            const precisaPagar = (contrato.status === 'active' || contrato.status === 'completed') && 
+                                 (!contrato.payment_id || (contrato.payment_status !== 'completed' && contrato.payment_status !== 'paid'));
+            
+            if (precisaPagar) {
                 avaliacaoHtml = `
+                    <a href="./pagamento.html?id=${contrato.contract_id}" 
+                       class="btn btn-sm btn-success mb-1">
+                        <i class="bi bi-credit-card"></i> Pagar
+                    </a>
+                `;
+            }
+            
+            // Adicionar botão de avaliação se aplicável
+            if (contrato.status === 'completed' && contrato.ja_avaliado == 0) {
+                avaliacaoHtml += `
                     <a href="./servico/avaliar-prestador.html?contract_id=${contrato.contract_id}" 
                        class="btn btn-sm btn-warning">
                         <i class="bi bi-star-fill"></i> Avaliar
                     </a>
                 `;
             } else if (contrato.ja_avaliado == 1) {
-                avaliacaoHtml = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Já avaliado</span>';
-            } else {
+                if (!precisaPagar) {
+                    avaliacaoHtml = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Já avaliado</span>';
+                } else {
+                    avaliacaoHtml += '<br><span class="badge bg-success mt-1"><i class="bi bi-check-circle"></i> Já avaliado</span>';
+                }
+            } else if (!precisaPagar && contrato.status !== 'completed') {
                 avaliacaoHtml = '<span class="badge bg-secondary">Aguardando conclusão</span>';
+            }
+            
+            // Se já foi pago, mostrar badge
+            if (contrato.payment_status === 'completed' || contrato.payment_status === 'paid') {
+                if (avaliacaoHtml && !avaliacaoHtml.includes('Pagar')) {
+                    avaliacaoHtml = '<span class="badge bg-success mb-1"><i class="bi bi-check-circle"></i> Pago</span><br>' + avaliacaoHtml;
+                } else if (!avaliacaoHtml) {
+                    avaliacaoHtml = '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Pago</span>';
+                }
             }
 
             row.innerHTML = `
