@@ -283,6 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <td>${user.email || ''}</td>
         <td>${user.telefone || 'Não informado'}</td>
         <td>${user.instagram || 'Não informado'}</td>
+        <td>${user.observacao || 'Não informado'}</td>
         <td>
           <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">
             ${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}
@@ -363,6 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <p><strong>Email:</strong> ${user.email}</p>
               <p><strong>Telefone:</strong> ${user.telefone}</p>
               ${user.instagram ? `<p><strong>Instagram:</strong> ${user.instagram}</p>` : ''}
+              ${user.observacao ? `<p><strong>Observação:</strong> ${user.observacao}</p>` : ''}
               <p><strong>Tipo:</strong> <span class="badge ${user.tipo_usuario === 'cliente' ? 'bg-primary' : 'bg-info'}">${user.tipo_usuario === 'cliente' ? 'Cliente' : 'Prestador'}</span></p>
             </div>
             <div class="col-md-6">

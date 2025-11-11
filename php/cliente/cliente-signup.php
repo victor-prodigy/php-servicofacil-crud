@@ -26,27 +26,59 @@ function validarDadosCliente($dados)
 function criarUsuario($pdo, $dados)
 {
     // Verificar se a coluna instagram existe na tabela user
-    $checkColumn = $pdo->query("SELECT COUNT(*) as count FROM INFORMATION_SCHEMA.COLUMNS 
+    $checkInstagram = $pdo->query("SELECT COUNT(*) as count FROM INFORMATION_SCHEMA.COLUMNS 
                                  WHERE TABLE_SCHEMA = DATABASE() 
                                  AND TABLE_NAME = 'user' 
                                  AND COLUMN_NAME = 'instagram'");
-    $result = $checkColumn->fetch(PDO::FETCH_ASSOC);
-    $columnExists = ($result && $result['count'] > 0);
+    $resultInstagram = $checkInstagram->fetch(PDO::FETCH_ASSOC);
+    $instagramExists = ($resultInstagram && $resultInstagram['count'] > 0);
 
-    if ($columnExists) {
-        $sql = "INSERT INTO user (email, password, name, phone_number, instagram, user_type, identity_verified) VALUES (?, ?, ?, ?, ?, 'cliente', FALSE)";
+    // Verificar se a coluna observacao existe
+    $checkObservacao = $pdo->query("SELECT COUNT(*) as count FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'user'
+        AND COLUMN_NAME = 'observacao'");
+    $resultObservacao = $checkObservacao->fetch(PDO::FETCH_ASSOC);
+    $observacaoExists = ($resultObservacao && $resultObservacao['count'] > 0);
+
+    $senha_hash = password_hash($dados['password'], PASSWORD_DEFAULT);
+
+    if ($instagramExists && $observacaoExists) {
+        // ✅ 8 colunas = 8 placeholders (6 com ? + 2 literais)
+        $sql = "INSERT INTO user (email, password, name, phone_number, instagram, observacao, user_type, identity_verified) 
+                VALUES (?, ?, ?, ?, ?, ?, 'cliente', FALSE)";
         $stmt = $pdo->prepare($sql);
-        $senha_hash = password_hash($dados['password'], PASSWORD_DEFAULT);
+        $instagram = !empty($dados['instagram']) ? $dados['instagram'] : null;
+        $observacao = !empty($dados['observacao']) ? $dados['observacao'] : null;
+
+        if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number'], $instagram, $observacao])) {
+            return $pdo->lastInsertId();
+        }
+    } elseif ($instagramExists) {
+        // ✅ Apenas instagram (7 colunas = 5 placeholders + 2 literais)
+        $sql = "INSERT INTO user (email, password, name, phone_number, instagram, user_type, identity_verified) 
+                VALUES (?, ?, ?, ?, ?, 'cliente', FALSE)";
+        $stmt = $pdo->prepare($sql);
         $instagram = !empty($dados['instagram']) ? $dados['instagram'] : null;
 
         if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number'], $instagram])) {
             return $pdo->lastInsertId();
         }
-    } else {
-        // Fallback: inserir sem instagram se a coluna não existir
-        $sql = "INSERT INTO user (email, password, name, phone_number, user_type, identity_verified) VALUES (?, ?, ?, ?, 'cliente', FALSE)";
+    } elseif ($observacaoExists) {
+        // ✅ Apenas observacao (7 colunas = 5 placeholders + 2 literais)
+        $sql = "INSERT INTO user (email, password, name, phone_number, observacao, user_type, identity_verified) 
+                VALUES (?, ?, ?, ?, ?, 'cliente', FALSE)";
         $stmt = $pdo->prepare($sql);
-        $senha_hash = password_hash($dados['password'], PASSWORD_DEFAULT);
+        $observacao = !empty($dados['observacao']) ? $dados['observacao'] : null;
+
+        if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number'], $observacao])) {
+            return $pdo->lastInsertId();
+        }
+    } else {
+        // ✅ Sem campos extras (6 colunas = 4 placeholders + 2 literais)
+        $sql = "INSERT INTO user (email, password, name, phone_number, user_type, identity_verified) 
+                VALUES (?, ?, ?, ?, 'cliente', FALSE)";
+        $stmt = $pdo->prepare($sql);
 
         if ($stmt->execute([$dados['email'], $senha_hash, $dados['name'], $dados['phone_number']])) {
             return $pdo->lastInsertId();
@@ -96,7 +128,8 @@ try {
         'email' => $_POST['email'] ?? '',
         'phone_number' => $_POST['phone_number'] ?? '',
         'password' => $_POST['password'] ?? '',
-        'instagram' => $_POST['instagram'] ?? ''
+        'instagram' => $_POST['instagram'] ?? '',
+        'observacao' => $_POST['observacao'] ?? ''
     ];
 
     // ✅ Validação
