@@ -19,6 +19,7 @@ try {
                 u.name,
                 u.phone_number,
                 u.instagram, # campo instagram na query
+                u.observacao, # campo observacao na query
                 u.status,
                 u.identity_verified,
                 u.created_at,
@@ -57,6 +58,7 @@ try {
             'email' => $usuario['email'],
             'telefone' => $usuario['phone_number'] ?: 'Não informado',
             'instagram' => $usuario['instagram'] ?: 'Não informado',
+            'observacao' => $usuario['observacao'] ?: 'Não informado', // ← ADICIONAR ESTE CAMPO
             'tipo_usuario' => $usuario['tipo_usuario'],
             'tipo_id' => $usuario['tipo_id'],
             'verificado' => $usuario['identity_verified'] ? true : false,
