@@ -18,7 +18,7 @@ try {
                 u.email,
                 u.name,
                 u.phone_number,
-                u.instagram,
+                u.instagram, # campo instagram na query
                 u.status,
                 u.identity_verified,
                 u.created_at,
